@@ -37,17 +37,15 @@ public class ThirdPersonMovement : MonoBehaviour
     [Header("Animation")]
 
     Animator anim;
-    NavMeshAgent agent;
-    float animSpeed = 0;
     bool running;
-
+    bool idle = true;
+    bool isJumping;
 
 
     private void Start()
     {
         UnityEngine.Cursor.lockState = CursorLockMode.None;
         anim = GetComponent<Animator>();
-        agent = GetComponent<NavMeshAgent>();
 
         
     }
@@ -56,34 +54,53 @@ public class ThirdPersonMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        switch(speed)
+        anim.SetFloat("Speed", speed);
+        if (idle)
         {
-            case 6:
-                animSpeed = 6;
-                break;
-            case 12:
-                animSpeed = 12f;
-                break;
-        }
+            speed = speed - 20 * Time.deltaTime;
+            if(speed < 0) speed = 0;
 
-        //if (!running) animSpeed = 0;
+        }
 
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
         if (isGrounded && velocity.y < 0)
         {
             velocity.y = -2f;
+            
+            
+        }
+
+        if(isGrounded)
+        {
+            anim.SetBool("IsJumping", false);
+            anim.SetBool("IsFalling", false);
+            isJumping = false;
+            AnimationTrigger("Grounded");   
+        }
+
+        else
+        {
+
+            if(isJumping && velocity.y < 0 || velocity.y < -2)
+            {
+                anim.SetBool("IsJumping", false);
+                anim.SetBool("IsFalling", true);
+            }
         }
 
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
 
-        anim.SetFloat("Speed", animSpeed);
-
         if (direction.magnitude >= 0.1f) 
         {
+
+            anim.SetBool("IsJumping", false);
+            anim.SetBool("IsFalling", false);
+            isJumping = false;
             running = true;
+            idle = false;
 
             //makes the player face the correct way
             //atan2 caculates what angle to rotate the player to face the desired direction
@@ -101,10 +118,15 @@ public class ThirdPersonMovement : MonoBehaviour
 
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
-            AnimationTrigger("Jump");
+            //AnimationTrigger("Jump");
+            anim.SetBool("IsJumping", true);
+            isJumping = true;
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            jumpHeight = jumpHeight + 3 * Time.deltaTime;
 
         }
+
+
 
         if (running)
         {
@@ -117,24 +139,52 @@ public class ThirdPersonMovement : MonoBehaviour
 
         characterController.Move(velocity * Time.deltaTime);
 
-        StartCoroutine(ResetSpeed()); 
+        StartCoroutine(ResetSpeed());
+        //StartCoroutine(IdleCheck());
     }
 
     IEnumerator SpeedIncrease()
     {
-        yield return new WaitForSeconds(1);
-        speed = 12;
+        //yield return new WaitForSeconds(1);
+        if(speed < 12)
+        {
+            speed = speed + 12 * Time.deltaTime;
+            if(speed >= 5 && speed <=6)
+            {
+                yield return new WaitForSeconds(1f);
+            }
+        }
+        if (speed > 12) speed = 12;
+        
+        //speed = 12;
     }
 
     IEnumerator ResetSpeed()
     {
         Vector3 prevPos = transform.position;
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.5f);
         Vector3 currentPos = transform.position;
         running = false;
-
-        if (prevPos == currentPos) speed = 6;
+        if (prevPos == currentPos)
+            if (speed > 6)
+            {
+                speed = speed - 10 * Time.deltaTime;
+                if (speed < 6) speed = 6;
+            }
         
+
+        StartCoroutine(IdleCheck());
+
+    }
+
+    IEnumerator IdleCheck()
+    {
+        Vector3 prevPos = transform.position;
+        yield return new WaitForSeconds(1f);
+        Vector3 currentPos = transform.position;
+
+        if (prevPos == currentPos) idle = true;
+
     }
 
 
@@ -143,4 +193,29 @@ public class ThirdPersonMovement : MonoBehaviour
         anim.SetTrigger(_anim);
     }
 
+
+    public void Hit()
+    {
+
+    }
+
+    public void Shoot()
+    {
+
+    }
+
+    public void Land()
+    {
+
+    }
+
+    public void FootR()
+    {
+
+    }
+
+    public void FootL()
+    {
+        
+    }
 }
