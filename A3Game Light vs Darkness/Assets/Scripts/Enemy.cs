@@ -47,8 +47,7 @@ public class Enemy : GameBehaviour
     bool preJumpPosBool = false;
     Vector3 preJumpPos;
     bool enterting;
-    bool invokeResetOrbit = true;
-    bool invokeResetAttackBool = true;
+
 
     private void Awake()
     {
@@ -59,6 +58,7 @@ public class Enemy : GameBehaviour
 
     private void Start()
     {
+        //player = GameObject.FindGameObjectWithTag("Player").transform;
  
     }
 
