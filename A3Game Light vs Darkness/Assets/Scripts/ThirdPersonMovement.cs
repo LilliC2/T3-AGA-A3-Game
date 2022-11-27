@@ -4,6 +4,8 @@ using Unity.VisualScripting;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.AI;
+using UnityEngine.UIElements;
 
 public class ThirdPersonMovement : MonoBehaviour
 {
@@ -11,6 +13,9 @@ public class ThirdPersonMovement : MonoBehaviour
     public CharacterController characterController;
     public Transform cam;
     public float speed = 6f;
+
+
+
 
     //directinal
     public float turnSmoothTime = 0.1f;
@@ -25,35 +30,44 @@ public class ThirdPersonMovement : MonoBehaviour
     Vector3 velocity;
     bool isGrounded;
 
-    ////running
-    //float sprintSpeed = 9f;
-    //bool sprinting;
-    //bool fatigued;
-    //float fatigueSpeed = 4.5f;
-
-    ////sneaking
-    //float sneakSpeed = 4;
-    //bool sneaking;
-   
 
     [Header("Player Stats")]
-
     public float playerHealth = 100; //temp
-    public float stamina = 10;
 
-    
-   
+    [Header("Animation")]
+
+    Animator anim;
+    NavMeshAgent agent;
+    float animSpeed = 0;
+    bool running;
+
 
 
     private void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
+        UnityEngine.Cursor.lockState = CursorLockMode.None;
+        anim = GetComponent<Animator>();
+        agent = GetComponent<NavMeshAgent>();
+
         
     }
+
 
     // Update is called once per frame
     void Update()
     {
+        switch(speed)
+        {
+            case 6:
+                animSpeed = 6;
+                break;
+            case 12:
+                animSpeed = 12f;
+                break;
+        }
+
+        //if (!running) animSpeed = 0;
+
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
         if (isGrounded && velocity.y < 0)
@@ -61,71 +75,16 @@ public class ThirdPersonMovement : MonoBehaviour
             velocity.y = -2f;
         }
 
-        //slowly regain stamina
-
-        //if (stamina < 10 && !sprinting && isGrounded)
-        //{
-        //    stamina += Time.deltaTime;
-        //}
-
-
-        //Debug.Log("Stamina: " + stamina);
-        //if(fatigued)Debug.Log("FATIGUED");
-
-        //inputs
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
 
-        //while sprinting
-        //if (Input.GetKey(KeyCode.LeftShift)&& isGrounded)
-        //{
-        //    if (!fatigued)
-        //    {
-        //        speed = sprintSpeed;
-        //        sprinting = true;
-        //    }
-
-        //    if (sprinting) stamina -= Time.deltaTime;
-
-        //    if (stamina <= 0) fatigued = true;
-                
-
-        //    if(fatigued)
-        //    {
-        //        sprinting = false;
-        //        speed = fatigueSpeed;
-
-        //        if (stamina >= 10)
-        //        {
-        //            fatigued = false;
-        //        }
-        //    }
-
-
-            //things to add
-            //jump further when sprinting
-        //}
-        ////while sneaking
-        //else if(Input.GetKey(KeyCode.LeftControl)&& isGrounded)
-        //{
-            
-        //    speed = sneakSpeed;
-        //    sneaking = true;
-
-        //    //things to add
-        //    //change player size
-        //}
-        //else
-        //{
-        //    speed = 6;
-        //    sneaking = false;
-        //    sprinting = false;
-        //}
-
+        anim.SetFloat("Speed", animSpeed);
 
         if (direction.magnitude >= 0.1f) 
         {
+            running = true;
+
             //makes the player face the correct way
             //atan2 caculates what angle to rotate the player to face the desired direction
             float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
@@ -133,39 +92,55 @@ public class ThirdPersonMovement : MonoBehaviour
             float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
             transform.rotation = Quaternion.Euler(0f, angle, 0f);
 
+
+
             Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
             characterController.Move(moveDir.normalized * speed * Time.deltaTime);
             
         }
+
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
-
+            AnimationTrigger("Jump");
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
 
-            //if (sprinting && sneaking != true)
-            //{
-                
-            //    velocity.y = 12;
-            //}
-            //if(sneaking && sprinting != true)
-            //{
-            //    velocity.y = 5;
-            //}
-            //else if(sprinting != true && sneaking != true)
-            //{
-            //    //sqrt is square root
-                
-            //}
-
-            
-            //to add
-            // when sneakig and press jump, do a roll
         }
+
+        if (running)
+        {
+            StartCoroutine(SpeedIncrease());
+        }
+        else StartCoroutine(ResetSpeed());
+
 
         velocity.y += gravity * Time.deltaTime;
 
         characterController.Move(velocity * Time.deltaTime);
 
-
+        StartCoroutine(ResetSpeed()); 
     }
+
+    IEnumerator SpeedIncrease()
+    {
+        yield return new WaitForSeconds(1);
+        speed = 12;
+    }
+
+    IEnumerator ResetSpeed()
+    {
+        Vector3 prevPos = transform.position;
+        yield return new WaitForSeconds(1);
+        Vector3 currentPos = transform.position;
+        running = false;
+
+        if (prevPos == currentPos) speed = 6;
+        
+    }
+
+
+    void AnimationTrigger(string _anim)
+    {
+        anim.SetTrigger(_anim);
+    }
+
 }

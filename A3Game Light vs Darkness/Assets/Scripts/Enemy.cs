@@ -51,14 +51,14 @@ public class Enemy : GameBehaviour
 
     private void Awake()
     {
-        player = GameObject.Find("TP Player").transform;
+        player = GameObject.Find("PlayerAvatar").transform;
         agent = GetComponent<NavMeshAgent>();
         enemyAnimation = gameObject.GetComponent<Animator>();
     }
 
     private void Start()
     {
-        //player = GameObject.FindGameObjectWithTag("Player").transform;
+        player = GameObject.FindGameObjectWithTag("Player").transform;
  
     }
 
@@ -137,7 +137,7 @@ public class Enemy : GameBehaviour
 
     IEnumerator AttackPlayer()
     {
-        print("Orbiting: " + orbiting);
+
 
         if (!preJumpPosBool)
         {
@@ -229,12 +229,11 @@ public class Enemy : GameBehaviour
                     //yield return new WaitForSeconds(1);
                     yield return new WaitForSeconds(0.5f);
                     float dist = Vector3.Distance(preJumpPos, transform.position);
-                    print(dist);
+
                     yield return new WaitForSeconds(0.5f);
                     if (dist < 3)
                     {
                         enemyAnimation.SetBool("Run Backward", false);
-                        print("distance < 3");
                         
                         alreadyAttacked = true;
                         Invoke(nameof(ResetAttack), timeBetweenAttacks);
