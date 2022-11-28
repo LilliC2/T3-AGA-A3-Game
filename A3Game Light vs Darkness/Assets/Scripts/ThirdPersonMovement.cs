@@ -14,8 +14,12 @@ public class ThirdPersonMovement : MonoBehaviour
     public Transform cam;
     public float speed = 6f;
 
+    public enum PlayerState
+    {
+        Idle, Run, Attack, Die, Jump, Fall
+    }
 
-
+    public PlayerState playerState;
 
     //directinal
     public float turnSmoothTime = 0.1f;
@@ -40,6 +44,7 @@ public class ThirdPersonMovement : MonoBehaviour
     bool running;
     bool idle = true;
     bool isJumping;
+    float attackTime;
 
 
     private void Start()
@@ -54,11 +59,12 @@ public class ThirdPersonMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
         anim.SetFloat("Speed", speed);
         if (idle)
         {
             speed = speed - 20 * Time.deltaTime;
-            if(speed < 0) speed = 0;
+            if (speed < 0) speed = 0;
 
         }
 
@@ -67,22 +73,21 @@ public class ThirdPersonMovement : MonoBehaviour
         if (isGrounded && velocity.y < 0)
         {
             velocity.y = -2f;
-            
-            
+
         }
 
-        if(isGrounded)
+        if (isGrounded)
         {
             anim.SetBool("IsJumping", false);
             anim.SetBool("IsFalling", false);
             isJumping = false;
-            AnimationTrigger("Grounded");   
+            AnimationTrigger("Grounded");
         }
 
         else
         {
 
-            if(isJumping && velocity.y < 0 || velocity.y < -2)
+            if (isJumping && velocity.y < 0 || velocity.y < -2)
             {
                 anim.SetBool("IsJumping", false);
                 anim.SetBool("IsFalling", true);
@@ -93,7 +98,7 @@ public class ThirdPersonMovement : MonoBehaviour
         float vertical = Input.GetAxisRaw("Vertical");
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
 
-        if (direction.magnitude >= 0.1f) 
+        if (direction.magnitude >= 0.1f)
         {
 
             anim.SetBool("IsJumping", false);
@@ -113,7 +118,7 @@ public class ThirdPersonMovement : MonoBehaviour
 
             Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
             characterController.Move(moveDir.normalized * speed * Time.deltaTime);
-            
+
         }
 
         if (Input.GetButtonDown("Jump") && isGrounded)
@@ -125,6 +130,8 @@ public class ThirdPersonMovement : MonoBehaviour
             jumpHeight = jumpHeight + 3 * Time.deltaTime;
 
         }
+
+
 
 
 
@@ -187,6 +194,11 @@ public class ThirdPersonMovement : MonoBehaviour
 
     }
 
+
+    public void Attack()
+    {
+
+    }
 
     void AnimationTrigger(string _anim)
     {
