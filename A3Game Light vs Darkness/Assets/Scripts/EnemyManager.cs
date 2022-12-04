@@ -7,6 +7,13 @@ public class EnemyManager : Singleton<EnemyManager>
 
     public List<GameObject> enemies;
 
+    public enum enemySize
+    {
+        Small, Medium, Large
+    }
+
+    public 
+
 
 
     // Start is called before the first frame update
