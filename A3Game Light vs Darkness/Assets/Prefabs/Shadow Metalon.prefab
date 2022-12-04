@@ -879,6 +879,7 @@ GameObject:
   - component: {fileID: 577366078846933269}
   - component: {fileID: 673229450791890998}
   - component: {fileID: 673229450791890993}
+  - component: {fileID: 6856558226295482376}
   m_Layer: 0
   m_Name: Shadow Metalon
   m_TagString: Untagged
@@ -993,6 +994,20 @@ MonoBehaviour:
   enemyInHitRange: 0
   alreadyAttacked: 0
   orbiting: 0
+--- !u!136 &6856558226295482376
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 671872832536291517}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 1.15
+  m_Height: 1.61
+  m_Direction: 1
+  m_Center: {x: -0.016821623, y: 0.81, z: -0.02}
 --- !u!1 &671893984928390163
 GameObject:
   m_ObjectHideFlags: 0

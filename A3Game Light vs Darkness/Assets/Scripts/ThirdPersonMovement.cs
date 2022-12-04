@@ -46,13 +46,15 @@ public class ThirdPersonMovement : MonoBehaviour
     bool isJumping;
     float attackTime;
 
+    string clipName;
+    AnimatorClipInfo[] animCurrentClipInfo;
+
 
     private void Start()
     {
         UnityEngine.Cursor.lockState = CursorLockMode.None;
         anim = GetComponent<Animator>();
-
-        
+ 
     }
 
 
@@ -131,7 +133,19 @@ public class ThirdPersonMovement : MonoBehaviour
 
         }
 
+        if(Input.GetButton("Fire1"))
+        {
 
+            Attack();
+        }
+
+        if (Input.GetButtonUp("Fire1"))
+        {
+            speed = 6;
+            attackTime = 0;
+            anim.SetFloat("AttackTime", attackTime);
+            print("attack reset");
+        }
 
 
 
@@ -197,6 +211,24 @@ public class ThirdPersonMovement : MonoBehaviour
 
     public void Attack()
     {
+
+        speed = 3;
+        attackTime ++;
+        anim.SetFloat("AttackTime", attackTime);
+
+
+        //loops attack cycle after final animation in cycle is played
+        animCurrentClipInfo = anim.GetCurrentAnimatorClipInfo(0);
+
+        clipName = animCurrentClipInfo[0].clip.name;
+        if (clipName == "2Hand-Sword-Attack5")
+        {
+            attackTime = 0;
+
+        }
+
+
+        
 
     }
 

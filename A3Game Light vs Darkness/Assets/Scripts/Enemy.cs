@@ -309,6 +309,7 @@ public class Enemy : GameBehaviour
 
     public void TakeDamage(int damage)
     {
+        print("OW");
         health -= damage;
         StartCoroutine(PlayAnimation("Take Damage"));
         if (health <= 0) Invoke(nameof(DestroyEnemy), 0.5f);
@@ -318,6 +319,24 @@ public class Enemy : GameBehaviour
     {
         StartCoroutine(PlayAnimation("Die"));
         Destroy(gameObject);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(collision.gameObject.CompareTag("Sword") )
+        {
+            print("detect");
+            //TakeDamage(10);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Sword"))
+        {
+            print("det ect");
+            //TakeDamage(10);
+        }
     }
 
     IEnumerator PlayAnimation(string _animName)
