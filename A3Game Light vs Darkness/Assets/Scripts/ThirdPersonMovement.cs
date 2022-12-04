@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UIElements;
 
-public class ThirdPersonMovement : MonoBehaviour
+public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
 {
     [Header("Movement Setting")]
     public CharacterController characterController;
@@ -37,6 +37,7 @@ public class ThirdPersonMovement : MonoBehaviour
 
     [Header("Player Stats")]
     public float playerHealth = 100; //temp
+    public int playerDamage = 10;
 
     [Header("Animation")]
 
@@ -62,22 +63,18 @@ public class ThirdPersonMovement : MonoBehaviour
     void Update()
     {
 
-        anim.SetFloat("Speed", speed);
-        if (idle)
-        {
-            speed = speed - 20 * Time.deltaTime;
-            if (speed < 0) speed = 0;
+        //print(playerState);
 
-        }
+        anim.SetFloat("Speed", speed);
 
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
         if (isGrounded && velocity.y < 0)
         {
             velocity.y = -2f;
-
         }
 
+        //reset animations if grounded
         if (isGrounded)
         {
             anim.SetBool("IsJumping", false);
@@ -85,75 +82,135 @@ public class ThirdPersonMovement : MonoBehaviour
             isJumping = false;
             AnimationTrigger("Grounded");
         }
-
+        //if not grounded, starting falling
         else
         {
-
             if (isJumping && velocity.y < 0 || velocity.y < -2)
             {
-                anim.SetBool("IsJumping", false);
-                anim.SetBool("IsFalling", true);
+                playerState = PlayerState.Fall;
             }
         }
 
+
+
+        //WASD inputs
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
 
+
         if (direction.magnitude >= 0.1f)
         {
-
-            anim.SetBool("IsJumping", false);
-            anim.SetBool("IsFalling", false);
-            isJumping = false;
-            running = true;
-            idle = false;
-
-            //makes the player face the correct way
-            //atan2 caculates what angle to rotate the player to face the desired direction
-            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
-            //makes so player doesnt snap to direction
-            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
-            transform.rotation = Quaternion.Euler(0f, angle, 0f);
-
-
-
-            Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
-            characterController.Move(moveDir.normalized * speed * Time.deltaTime);
-
+            playerState = PlayerState.Run;
         }
 
+        //jump animations and movement
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
-            //AnimationTrigger("Jump");
-            anim.SetBool("IsJumping", true);
-            isJumping = true;
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-            jumpHeight = jumpHeight + 3 * Time.deltaTime;
+            playerState = PlayerState.Jump;
 
         }
 
-        if(Input.GetButton("Fire1"))
+        //attack
+        if (Input.GetButton("Fire1"))
         {
-
-            Attack();
+            playerState = PlayerState.Attack;
         }
-
+        //reset attackTime when mouse button is release
         if (Input.GetButtonUp("Fire1"))
         {
             speed = 6;
             attackTime = 0;
             anim.SetFloat("AttackTime", attackTime);
-            print("attack reset");
+
+            playerState = PlayerState.Idle;
         }
 
-
-
-        if (running)
+        switch (playerState)
         {
-            StartCoroutine(SpeedIncrease());
+            case PlayerState.Idle:
+
+                //if idle slowly decrease speed to 0
+                if (idle)
+                {
+                    speed = speed - 20 * Time.deltaTime;
+                    if (speed < 0) speed = 0;
+                }
+
+                break;
+            case PlayerState.Run:
+
+                anim.SetFloat("Speed", speed);
+
+                if (direction.magnitude >= 0.1f)
+                {
+                    //turn off jumping and falling animations fail safe
+                    anim.SetBool("IsJumping", false);
+                    anim.SetBool("IsFalling", false);
+                    isJumping = false;
+                    running = true;
+                    idle = false;
+
+                    //makes the player face the correct way
+                    //atan2 caculates what angle to rotate the player to face the desired direction
+                    float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
+                    //makes so player doesnt snap to direction
+                    float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
+                    transform.rotation = Quaternion.Euler(0f, angle, 0f);
+
+
+                    //move player
+                    Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
+                    characterController.Move(moveDir.normalized * speed * Time.deltaTime);
+
+                }
+
+                //slowly increase speed until max when running
+                if (running)
+                {
+                    StartCoroutine(SpeedIncrease());
+                }
+                //check if not running if so slowly decrease speed
+                else StartCoroutine(ResetSpeed());
+
+                break;
+            case PlayerState.Attack:
+
+                Attack();
+
+                
+
+
+                break;
+            case PlayerState.Die:
+                break;
+            case PlayerState.Jump:
+
+                //AnimationTrigger("Jump");
+                anim.SetBool("IsJumping", true);
+                isJumping = true;
+                velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+                jumpHeight = jumpHeight + 3 * Time.deltaTime;
+
+                if (!isGrounded)
+                {
+                    playerState = PlayerState.Fall;
+                }
+
+                break;
+            case PlayerState.Fall:
+                anim.SetBool("IsJumping", false);
+                anim.SetBool("IsFalling", true);
+                isJumping=false;
+
+                if(isGrounded)
+                {
+                    playerState = PlayerState.Idle;
+                }
+
+                break;
+
         }
-        else StartCoroutine(ResetSpeed());
 
 
         velocity.y += gravity * Time.deltaTime;
@@ -192,50 +249,54 @@ public class ThirdPersonMovement : MonoBehaviour
                 speed = speed - 10 * Time.deltaTime;
                 if (speed < 6) speed = 6;
             }
-        
 
         StartCoroutine(IdleCheck());
-
     }
 
     IEnumerator IdleCheck()
     {
+        //if stationatry for 1 second, become idle
         Vector3 prevPos = transform.position;
         yield return new WaitForSeconds(1f);
         Vector3 currentPos = transform.position;
 
-        if (prevPos == currentPos) idle = true;
-
+        if (prevPos == currentPos)
+        {
+            idle = true;
+            playerState = PlayerState.Idle;
+        }
     }
 
 
     public void Attack()
     {
-
+        animCurrentClipInfo = anim.GetCurrentAnimatorClipInfo(0);
+        playerState = PlayerState.Attack;
         speed = 3;
         attackTime ++;
         anim.SetFloat("AttackTime", attackTime);
 
+        //moves player forward each attack animation
+
+        this.transform.position = transform.forward * 2;
+
 
         //loops attack cycle after final animation in cycle is played
-        animCurrentClipInfo = anim.GetCurrentAnimatorClipInfo(0);
+        
 
         clipName = animCurrentClipInfo[0].clip.name;
         if (clipName == "2Hand-Sword-Attack5")
         {
             attackTime = 0;
 
-        }
+        } 
 
 
-        
+
 
     }
 
-    void AnimationTrigger(string _anim)
-    {
-        anim.SetTrigger(_anim);
-    }
+    
 
 
     public void Hit()

@@ -5,20 +5,27 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UIElements;
+using static Enemy;
 
 public class Enemy : GameBehaviour
 {
+    public enum EnemyState
+    {
+        Patrol, Chase, Attack, Hit, Die 
+    }
+
+    EnemyState enemyState;
+    
     public NavMeshAgent agent;
     public Transform player;
     public LayerMask whatIsGround, whatIsPlayer;
 
-    public float health;
+    public float health = 20;
 
     //patrolling
     public Vector3 walkPoint;
     bool walkPointSet;
     public float walkPointRange;
-
 
 
     //attacking
@@ -38,6 +45,7 @@ public class Enemy : GameBehaviour
     //animation
     //animation
     Animator enemyAnimation;
+    bool deathAnimation = false;
 
     //atacking orbit
     public bool orbiting = true;
@@ -69,9 +77,44 @@ public class Enemy : GameBehaviour
         playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
         enemyInHitRange = Physics.CheckSphere(transform.position, playerHitRange, whatIsPlayer);
 
-        if (!playerInSightRange && !playerInAttackRange) StartCoroutine(PatrolingIE());
-        if (playerInSightRange && !playerInAttackRange) ChasePlayer();
-        if (playerInAttackRange && playerInSightRange) StartCoroutine(AttackPlayer());
+        //makes sure once enemy dies it cannot react to anything above
+        if(enemyState != EnemyState.Die && enemyState != EnemyState.Hit)
+        {
+            if (!playerInSightRange && !playerInAttackRange) enemyState = EnemyState.Patrol;
+            if (playerInSightRange && !playerInAttackRange) enemyState = EnemyState.Chase;
+            if (playerInAttackRange && playerInSightRange) enemyState = EnemyState.Attack;
+        }
+
+        print(enemyState);
+        
+
+        switch (enemyState)
+        {
+            case EnemyState.Patrol:
+                StartCoroutine(PatrolingIE());
+                break;
+            case EnemyState.Chase:
+                ChasePlayer();
+                break;
+            case EnemyState.Attack:
+                StartCoroutine(AttackPlayer());
+                break;
+            case EnemyState.Hit:
+                TakeDamage(_P.playerDamage);
+
+                break;
+            case EnemyState.Die:
+                agent.SetDestination(transform.position); 
+                if (!deathAnimation)
+                {
+                    StartCoroutine(Die());
+                }
+                
+
+                break;
+
+        }
+
 
     }
 
@@ -181,7 +224,7 @@ public class Enemy : GameBehaviour
             {
                 enemyAnimation.SetBool("Run Forward", false);
                 //enemyAnimation.SetBool("Run Forward", true);
-                StartCoroutine(PlayAnimation("Jump"));
+                StartCoroutine(PlayAnimationBool("Jump"));
                 jumped = true;
                 enterting = true;
             }
@@ -211,7 +254,7 @@ public class Enemy : GameBehaviour
 
                 if(!hit) //stab animation
                 {
-                    StartCoroutine(PlayAnimation("Stab Attack"));
+                    StartCoroutine(PlayAnimationBool("Stab Attack"));
                     hit = true;
 
                     // ADD ATTACK CODE IN HERE
@@ -239,8 +282,6 @@ public class Enemy : GameBehaviour
                         Invoke(nameof(ResetAttack), timeBetweenAttacks);
                         
                     }
-                    
-
                 }
             }
         }
@@ -272,9 +313,6 @@ public class Enemy : GameBehaviour
 
         if (rotate == 0) OrbitPlayerLeft(degreesPerSecond);
         if (rotate == 1) OrbitPlayerRight(degreesPerSecond);
-
-        //print(rotate);
-
 
         
     }
@@ -309,44 +347,48 @@ public class Enemy : GameBehaviour
 
     public void TakeDamage(int damage)
     {
-        print("OW");
-        health -= damage;
-        StartCoroutine(PlayAnimation("Take Damage"));
-        if (health <= 0) Invoke(nameof(DestroyEnemy), 0.5f);
+        if (health <= 0) enemyState = EnemyState.Die;
+        else
+        {
+            print("OW");
+            health -= damage;
+            AnimationTrigger("Take Damage");
+            enemyState = EnemyState.Patrol;
+        }
     }
 
     private void DestroyEnemy()
-    {
-        StartCoroutine(PlayAnimation("Die"));
+    {        
         Destroy(gameObject);
     }
 
-    private void OnCollisionEnter(Collision collision)
+    IEnumerator Die()
     {
-        if(collision.gameObject.CompareTag("Sword") )
-        {
-            print("detect");
-            //TakeDamage(10);
-        }
+        //ensures this is only called once
+        deathAnimation = true;
+        agent.SetDestination(transform.position);
+        AnimationTrigger("Die");
+
+        yield return new WaitForSeconds(6.5f);
+
+        DestroyEnemy();
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Sword"))
         {
-            print("det ect");
-            //TakeDamage(10);
+            //only take damage if player is attacking
+            if(_P.playerState == ThirdPersonMovement.PlayerState.Attack)
+            {
+                print("detect");
+                enemyState = EnemyState.Hit;
+                
+            }  
         }
     }
 
-    IEnumerator PlayAnimation(string _animName)
-    {
-        //print(_animName);
-
-        enemyAnimation.SetBool(_animName, true);
-        yield return new WaitForSeconds(enemyAnimation.GetCurrentAnimatorStateInfo(0).length);
-        enemyAnimation.SetBool(_animName, false);
-    }
+    
 
     //visualise sight range
     private void OnDrawGizmosSelected()
