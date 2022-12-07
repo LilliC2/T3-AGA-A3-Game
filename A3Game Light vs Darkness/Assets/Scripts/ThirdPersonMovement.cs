@@ -218,7 +218,6 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
         characterController.Move(velocity * Time.deltaTime);
 
         StartCoroutine(ResetSpeed());
-        //StartCoroutine(IdleCheck());
     }
 
     IEnumerator SpeedIncrease()
@@ -260,7 +259,7 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
         yield return new WaitForSeconds(1f);
         Vector3 currentPos = transform.position;
 
-        if (prevPos == currentPos)
+        if (prevPos == currentPos && playerState != PlayerState.Attack)
         {
             idle = true;
             playerState = PlayerState.Idle;
@@ -278,7 +277,7 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
 
         //moves player forward each attack animation
 
-        this.transform.position = transform.forward * 2;
+        //this.transform.position = transform.forward * 2;
 
 
         //loops attack cycle after final animation in cycle is played

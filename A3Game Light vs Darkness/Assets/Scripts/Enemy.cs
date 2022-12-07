@@ -85,7 +85,7 @@ public class Enemy : GameBehaviour
             if (playerInAttackRange && playerInSightRange) enemyState = EnemyState.Attack;
         }
 
-        print(enemyState);
+        //print(enemyState);
         
 
         switch (enemyState)
@@ -378,17 +378,16 @@ public class Enemy : GameBehaviour
     {
         if (other.gameObject.CompareTag("Sword"))
         {
-            //only take damage if player is attacking
+            //only if player is attacking
             if(_P.playerState == ThirdPersonMovement.PlayerState.Attack)
             {
-                print("detect");
+                print("sword enter collision");
                 enemyState = EnemyState.Hit;
                 
             }  
         }
     }
 
-    
 
     //visualise sight range
     private void OnDrawGizmosSelected()
