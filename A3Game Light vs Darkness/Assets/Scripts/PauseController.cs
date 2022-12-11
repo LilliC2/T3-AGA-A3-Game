@@ -16,13 +16,13 @@ public class PauseController : GameBehaviour
 
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             Pause();
         }
     }
 
-   public void Pause()
+    public void Pause()
     {
         Cursor.lockState = isPaused ? CursorLockMode.Locked : CursorLockMode.None;
         isPaused = !isPaused; //flip switch
@@ -30,7 +30,7 @@ public class PauseController : GameBehaviour
         Time.timeScale = isPaused ? 0 : 1; //if isPaused is true, timeScale 0 else 1
     }
 
-   public void ExitGame()
+    public void ExitGame()
     {
         Application.Quit();
     }

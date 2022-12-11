@@ -4,17 +4,19 @@ using System.Collections.Generic;
 using RPGCharacterAnims.Actions;
 using RPGCharacterAnims.Extensions;
 using RPGCharacterAnims.Lookups;
+using WarriorAnimsFREE;
+using AnimatorTrigger = RPGCharacterAnims.Lookups.AnimatorTrigger;
 
 namespace RPGCharacterAnims
 {
-	/// <summary>
+    /// <summary>
     /// RPGCharacterController is the main entry point for triggering animations and holds all the
     /// state related to a character. It is the core component of this package–no other controller
     /// will run without it.
     /// </summary>
     public class RPGCharacterController : MonoBehaviour
     {
-	    /// <summary>
+        /// <summary>
         /// Event called when actions are locked by an animation.
         /// </summary>
         public event System.Action OnLockActions = delegate { };
@@ -44,21 +46,21 @@ namespace RPGCharacterAnims
         /// </summary>
         public float animationSpeed = 1;
 
-		/// <summary>
-		/// IKHands component.
-		/// </summary>
-		[HideInInspector] public IKHands ikHands;
+        /// <summary>
+        /// IKHands component.
+        /// </summary>
+        [HideInInspector] public IKHands ikHands;
 
-		/// <summary>
-		/// Target for Aiming/Strafing.
-		/// </summary>
-		public Transform target;
+        /// <summary>
+        /// Target for Aiming/Strafing.
+        /// </summary>
+        public Transform target;
 
-		/// <summary>
-		/// Returns whether the character can take actions.
-		/// </summary>
-		public bool canAction => _canAction && !isNavigating;
-		private bool _canAction;
+        /// <summary>
+        /// Returns whether the character can take actions.
+        /// </summary>
+        public bool canAction => _canAction && !isNavigating;
+        private bool _canAction;
 
         /// <summary>
         /// Returns whether the character can face.
@@ -93,7 +95,7 @@ namespace RPGCharacterAnims
 		/// Returns whether the Attack action is active.
 		/// </summary>
 		public bool isAttacking => _isAttacking;
-		private bool _isAttacking;
+        private bool _isAttacking;
 
         /// <summary>
 		/// Returns whether the Facing action is active.
@@ -124,11 +126,11 @@ namespace RPGCharacterAnims
 		/// </summary>
 		public bool isNavigating => TryGetHandlerActive(HandlerTypes.Navigation);
 
-		/// <summary>
-		/// Returns whether the Roll action is active. Roll is added by
-		/// RPGCharacterMovementController.
-		/// </summary>
-		public bool isRolling => TryGetHandlerActive(HandlerTypes.Roll);
+        /// <summary>
+        /// Returns whether the Roll action is active. Roll is added by
+        /// RPGCharacterMovementController.
+        /// </summary>
+        public bool isRolling => TryGetHandlerActive(HandlerTypes.Roll);
 
         /// <summary>
 		/// Returns whether the Roll action is active. Roll is added by
@@ -184,39 +186,40 @@ namespace RPGCharacterAnims
         public Vector3 cameraRelativeInput => _cameraRelativeInput;
         private Vector3 _cameraRelativeInput;
 
-		/// <summary>
-		/// Integer weapon number for the right hand. See the Weapon enum in AnimationData.cs for a
-		/// full list.
-		/// </summary>
-		[HideInInspector] public Weapon rightWeapon = Weapon.Unarmed;
+        /// <summary>
+        /// Integer weapon number for the right hand. See the Weapon enum in AnimationData.cs for a
+        /// full list.
+        /// </summary>
+        [HideInInspector] public Weapon rightWeapon = Weapon.Unarmed;
 
-		/// <summary>
-		/// Integer weapon number for the left hand. See the Weapon enum in AnimationData.cs for a
-		/// full list.
-		/// </summary>
-		[HideInInspector] public Weapon leftWeapon = Weapon.Unarmed;
+        /// <summary>
+        /// Integer weapon number for the left hand. See the Weapon enum in AnimationData.cs for a
+        /// full list.
+        /// </summary>
+        [HideInInspector] public Weapon leftWeapon = Weapon.Unarmed;
 
-		/// <summary>
-		/// Returns whether the character is holding a two-handed weapon. Two-handed weapons are
-		/// "held" in the right hand.
-		/// </summary>
-		public bool hasTwoHandedWeapon => rightWeapon.Is2HandedWeapon();
+        /// <summary>
+        /// Returns whether the character is holding a two-handed weapon. Two-handed weapons are
+        /// "held" in the right hand.
+        /// </summary>
+        public bool hasTwoHandedWeapon => rightWeapon.Is2HandedWeapon();
 
-		/// <summary>
-		/// Returns whether the character is in Unarmed or Relax state.
-		/// </summary>
-		public bool hasNoWeapon => rightWeapon.HasNoWeapon() && leftWeapon.HasNoWeapon();
+        /// <summary>
+        /// Returns whether the character is in Unarmed or Relax state.
+        /// </summary>
+        public bool hasNoWeapon => rightWeapon.HasNoWeapon() && leftWeapon.HasNoWeapon();
 
-		private Dictionary<string, IActionHandler> actionHandlers = new Dictionary<string, IActionHandler>();
+        private Dictionary<string, IActionHandler> actionHandlers = new Dictionary<string, IActionHandler>();
 
-		#region Initialization
+        #region Initialization
 
         private void Awake()
         {
             // Setup Animator, add AnimationEvents script.
             animator = GetComponentInChildren<Animator>();
 
-            if (!animator) {
+            if (!animator)
+            {
                 Debug.LogError("ERROR: THERE IS NO ANIMATOR COMPONENT ON CHILD OF CHARACTER.");
                 Debug.Break();
             }
@@ -227,7 +230,7 @@ namespace RPGCharacterAnims
             animator.SetInteger(AnimationParameters.Weapon, 0);
             animator.SetInteger(AnimationParameters.WeaponSwitch, 0);
 
-			// Setup IKhands if used.
+            // Setup IKhands if used.
             ikHands = GetComponentInChildren<IKHands>();
 
             SetHandler(HandlerTypes.Attack, new Attack());
@@ -239,20 +242,20 @@ namespace RPGCharacterAnims
             // Unlock actions and movement.
             Unlock(true, true);
 
-			// Set Aim Input.
-			SetAimInput(target.transform.position);
-		}
+            // Set Aim Input.
+            SetAimInput(target.transform.position);
+        }
 
-		#endregion
+        #endregion
 
-		#region Actions
+        #region Actions
 
-		/// <summary>
-		/// Set an action handler.
-		/// </summary>
-		/// <param name="action">Name of the action.</param>
-		/// <param name="handler">The handler associated with this action.</param>
-		public void SetHandler(string action, IActionHandler handler)
+        /// <summary>
+        /// Set an action handler.
+        /// </summary>
+        /// <param name="action">Name of the action.</param>
+        /// <param name="handler">The handler associated with this action.</param>
+        public void SetHandler(string action, IActionHandler handler)
         { actionHandlers[action] = handler; }
 
         /// <summary>
@@ -275,7 +278,7 @@ namespace RPGCharacterAnims
         { return actionHandlers.ContainsKey(action); }
 
         public bool TryGetHandlerActive(string action)
-		{ return HandlerExists(action) && IsActive(action); }
+        { return HandlerExists(action) && IsActive(action); }
 
         /// <summary>
         /// Check if an action is active.
@@ -295,19 +298,19 @@ namespace RPGCharacterAnims
 
         public bool TryStartAction(string action, object context = null)
         {
-	        if (!CanStartAction(action)) { return false; }
+            if (!CanStartAction(action)) { return false; }
 
-	        if (context == null) { StartAction(action); }
-	        else { StartAction(action, context);}
+            if (context == null) { StartAction(action); }
+            else { StartAction(action, context); }
 
-	        return true;
+            return true;
         }
 
         public bool TryEndAction(string action)
         {
-	        if (!CanEndAction(action)) { return false; }
-	        EndAction(action);
-	        return true;
+            if (!CanEndAction(action)) { return false; }
+            EndAction(action);
+            return true;
         }
 
         /// <summary>
@@ -414,9 +417,9 @@ namespace RPGCharacterAnims
         /// <param name="rollType">1- Forward.</param>
         public void DiveRoll(DiveRollType rollType)
         {
-	        animator.TriggerDiveRoll(rollType);
+            animator.TriggerDiveRoll(rollType);
             Lock(true, true, true, 0, 1f);
-			SetIKPause(1.05f);
+            SetIKPause(1.05f);
         }
 
         /// <summary>
@@ -427,15 +430,18 @@ namespace RPGCharacterAnims
         /// <param name="direction">1- Backwards, 2- Backward version2.</param>
         public void Knockback(KnockbackType direction)
         {
-	        animator.TriggerKnockback(direction);
-			switch (direction) {
-				case KnockbackType.Knockback1: SetIKPause(1.125f);
-					Lock(true, true, true, 0, 1f);
-					break;
-				case KnockbackType.Knockback2: SetIKPause(1f);
-					Lock(true, true, true, 0, 0.8f);
-					break;
-			}
+            animator.TriggerKnockback(direction);
+            switch (direction)
+            {
+                case KnockbackType.Knockback1:
+                    SetIKPause(1.125f);
+                    Lock(true, true, true, 0, 1f);
+                    break;
+                case KnockbackType.Knockback2:
+                    SetIKPause(1f);
+                    Lock(true, true, true, 0, 0.8f);
+                    break;
+            }
         }
 
         /// <summary>
@@ -446,14 +452,14 @@ namespace RPGCharacterAnims
         /// <param name="direction">1- Backwards.</param>
         public void Knockdown(KnockdownType direction)
         {
-	        animator.TriggerKnockdown(direction);
+            animator.TriggerKnockdown(direction);
             Lock(true, true, true, 0, 5.25f);
-			SetIKPause(5.25f);
-		}
+            SetIKPause(5.25f);
+        }
 
-		#endregion
+        #endregion
 
-		#region Combat
+        #region Combat
 
         /// <summary>
         /// Trigger an attack animation.
@@ -467,14 +473,14 @@ namespace RPGCharacterAnims
         /// <param name="duration">Duration in seconds that animation is locked.</param>
         public void Attack(int attackNumber, Side attackSide, Weapon leftWeapon, Weapon rightWeapon, float duration)
         {
-	        animator.SetSide(attackSide);
-			_isAttacking = true;
+            animator.SetSide(attackSide);
+            _isAttacking = true;
             Lock(true, true, true, 0, duration);
 
-			// Trigger the animation.
-			var attackTriggerType = AnimatorTrigger.AttackTrigger;
-			animator.SetActionTrigger(attackTriggerType, attackNumber);
-		}
+            // Trigger the animation.
+            var attackTriggerType = AnimatorTrigger.AttackTrigger;
+            animator.SetActionTrigger(attackTriggerType, attackNumber);
+        }
 
         /// <summary>
         /// Trigger the running attack animation.
@@ -487,11 +493,12 @@ namespace RPGCharacterAnims
         /// <param name="twoHandedWeapon">If wielding a two-handed weapon.</param>
         public void RunningAttack(Side side, bool leftWeapon, bool rightWeapon, bool twoHandedWeapon)
         {
-			if (side == Side.Right && rightWeapon) { animator.SetActionTrigger(AnimatorTrigger.AttackTrigger, 4); }
-			else if (hasNoWeapon) {
-				animator.SetSide(side);
-				animator.SetActionTrigger(AnimatorTrigger.AttackTrigger, 1);
-			}
+            if (side == Side.Right && rightWeapon) { animator.SetActionTrigger(AnimatorTrigger.AttackTrigger, 4); }
+            else if (hasNoWeapon)
+            {
+                animator.SetSide(side);
+                animator.SetActionTrigger(AnimatorTrigger.AttackTrigger, 1);
+            }
         }
 
         /// <summary>
@@ -538,9 +545,9 @@ namespace RPGCharacterAnims
         public void GetHit(int hitNumber)
         {
             animator.TriggerGettingHit(hitNumber);
-			Lock(true, true, true, 0.1f, 0.4f);
-			SetIKPause(0.6f);
-		}
+            Lock(true, true, true, 0.1f, 0.4f);
+            SetIKPause(0.6f);
+        }
 
         #endregion
 
@@ -553,13 +560,13 @@ namespace RPGCharacterAnims
         public GameObject GetAnimatorTarget()
         { return animator.gameObject; }
 
-		/// <summary>
-		/// Returns the current animation length of the given animation layer.
-		/// </summary>
-		/// <param name="animationlayer">The animation layer being checked.</param>
-		/// <returns>Float time of the currently played animation on animationlayer.</returns>
-		private float CurrentAnimationLength(int animationlayer)
-		{ return animator.GetCurrentAnimatorClipInfo(animationlayer).Length; }
+        /// <summary>
+        /// Returns the current animation length of the given animation layer.
+        /// </summary>
+        /// <param name="animationlayer">The animation layer being checked.</param>
+        /// <returns>Float time of the currently played animation on animationlayer.</returns>
+        private float CurrentAnimationLength(int animationlayer)
+        { return animator.GetCurrentAnimatorClipInfo(animationlayer).Length; }
 
         /// <summary>
         /// Lock character movement and/or action, on a delay for a set time.
@@ -579,15 +586,18 @@ namespace RPGCharacterAnims
         {
             if (delayTime > 0) { yield return new WaitForSeconds(delayTime); }
 
-            if (lockMovement) {
+            if (lockMovement)
+            {
                 _canMove = false;
                 OnLockMovement();
             }
-            if (lockAction) {
+            if (lockAction)
+            {
                 _canAction = false;
                 OnLockActions();
             }
-            if (timed) {
+            if (timed)
+            {
                 if (lockTime > 0) { yield return new WaitForSeconds(lockTime); }
                 Unlock(lockMovement, lockAction);
             }
@@ -600,44 +610,45 @@ namespace RPGCharacterAnims
         /// <param name="actions">Unlock actions if true.</param>
         public void Unlock(bool movement, bool actions)
         {
-            if (movement) {
+            if (movement)
+            {
                 _canMove = true;
                 OnUnlockMovement();
             }
 
-			if (!actions) { return; }
+            if (!actions) { return; }
 
             _canAction = true;
-			if (_isAttacking) { _isAttacking = false; }
+            if (_isAttacking) { _isAttacking = false; }
             OnUnlockActions();
         }
 
-		/// <summary>
-		/// Turns IK to 0 instantly.
-		/// </summary>
-		public void SetIKOff()
-		{
-			if (ikHands == null) return;
-			ikHands.leftHandPositionWeight = 0;
-			ikHands.leftHandRotationWeight = 0;
-		}
+        /// <summary>
+        /// Turns IK to 0 instantly.
+        /// </summary>
+        public void SetIKOff()
+        {
+            if (ikHands == null) return;
+            ikHands.leftHandPositionWeight = 0;
+            ikHands.leftHandRotationWeight = 0;
+        }
 
-		/// <summary>
-		/// Turns IK to 1 instantly.
-		/// </summary>
-		public void SetIKOn(Weapon weapon)
-		{
-			if (ikHands != null) { ikHands.BlendIK(true, 0, 0, weapon); }
-		}
+        /// <summary>
+        /// Turns IK to 1 instantly.
+        /// </summary>
+        public void SetIKOn(Weapon weapon)
+        {
+            if (ikHands != null) { ikHands.BlendIK(true, 0, 0, weapon); }
+        }
 
-		/// <summary>
-		/// Pauses IK while character uses Left Hand during an animation.
-		/// </summary>
-		public void SetIKPause(float pauseTime)
-		{
-			if (ikHands != null && ikHands.isUsed) { ikHands.SetIKPause(pauseTime); }
-		}
+        /// <summary>
+        /// Pauses IK while character uses Left Hand during an animation.
+        /// </summary>
+        public void SetIKPause(float pauseTime)
+        {
+            if (ikHands != null && ikHands.isUsed) { ikHands.SetIKPause(pauseTime); }
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }

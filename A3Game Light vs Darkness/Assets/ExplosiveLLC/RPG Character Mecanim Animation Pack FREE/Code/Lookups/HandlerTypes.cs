@@ -1,7 +1,7 @@
 namespace RPGCharacterAnims.Lookups
 {
     public class HandlerTypes
-	{
+    {
         public static readonly string Aim = "Aim";
         public static readonly string Attack = "Attack";
         public static readonly string Face = "Face";
@@ -20,8 +20,8 @@ namespace RPGCharacterAnims.Lookups
         public static readonly string SwitchWeapon = "SwitchWeapon";
         public static readonly string Switch = "Switch";
         public static readonly string DiveRoll = "DiveRoll";
-		public static readonly string Roll = "Roll";
-		public static readonly string Jump = "Jump";
+        public static readonly string Roll = "Roll";
+        public static readonly string Jump = "Jump";
         public static readonly string DoubleJump = "DoubleJump";
     }
 }

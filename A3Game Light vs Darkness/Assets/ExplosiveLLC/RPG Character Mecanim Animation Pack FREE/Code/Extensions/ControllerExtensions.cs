@@ -14,7 +14,7 @@ namespace RPGCharacterAnims.Extensions
             Debug.Log("canStrafe: " + controller.canStrafe);
             Debug.Log("acquiringGround: " + controller.acquiringGround);
             Debug.Log("maintainingGround: " + controller.maintainingGround);
-			Debug.Log("isAttacking: " + controller.isAttacking);
+            Debug.Log("isAttacking: " + controller.isAttacking);
             Debug.Log("isFacing: " + controller.isFacing);
             Debug.Log("isFalling: " + controller.isFalling);
             Debug.Log("isIdle: " + controller.isIdle);

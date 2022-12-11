@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Singleton <T> :GameBehaviour where T : GameBehaviour
+public class Singleton<T> : GameBehaviour where T : GameBehaviour
 {
     public bool dontDestroy;
     private static T instance_;

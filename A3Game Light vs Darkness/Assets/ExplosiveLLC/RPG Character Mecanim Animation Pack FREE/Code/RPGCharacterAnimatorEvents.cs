@@ -6,12 +6,12 @@ public class AnimatorMoveEvent : UnityEvent<Vector3, Quaternion> { }
 
 namespace RPGCharacterAnims
 {
-	[HelpURL("https://docs.unity3d.com/Manual/script-AnimationWindowEvent.html")]
+    [HelpURL("https://docs.unity3d.com/Manual/script-AnimationWindowEvent.html")]
 
     public class RPGCharacterAnimatorEvents : MonoBehaviour
     {
-		// Event call functions for Animation events.
-		public UnityEvent OnHit = new UnityEvent();
+        // Event call functions for Animation events.
+        public UnityEvent OnHit = new UnityEvent();
         public UnityEvent OnShoot = new UnityEvent();
         public UnityEvent OnFootR = new UnityEvent();
         public UnityEvent OnFootL = new UnityEvent();
@@ -20,13 +20,13 @@ namespace RPGCharacterAnims
 
         public AnimatorMoveEvent OnMove = new AnimatorMoveEvent();
 
-		// Components.
-		private RPGCharacterController rpgCharacterController;
+        // Components.
+        private RPGCharacterController rpgCharacterController;
         private Animator animator;
 
         void Awake()
         {
-			rpgCharacterController = GetComponentInParent<RPGCharacterController>();
+            rpgCharacterController = GetComponentInParent<RPGCharacterController>();
             animator = GetComponent<Animator>();
         }
 
@@ -39,15 +39,15 @@ namespace RPGCharacterAnims
         public void WeaponSwitch() => OnWeaponSwitch.Invoke();
 
         // Used for animations that contain root motion to drive the character’s
-		// position and rotation using the “Motion” node of the animation file.
-		void OnAnimatorMove()
-		{
-			if (!animator) { return; }
+        // position and rotation using the “Motion” node of the animation file.
+        void OnAnimatorMove()
+        {
+            if (!animator) { return; }
 
-			// Not used when using Navmesh Navigation.
-			if (rpgCharacterController.isNavigating) { return; }
+            // Not used when using Navmesh Navigation.
+            if (rpgCharacterController.isNavigating) { return; }
 
-			OnMove.Invoke(animator.deltaPosition, animator.rootRotation);
-		}
+            OnMove.Invoke(animator.deltaPosition, animator.rootRotation);
+        }
     }
 }

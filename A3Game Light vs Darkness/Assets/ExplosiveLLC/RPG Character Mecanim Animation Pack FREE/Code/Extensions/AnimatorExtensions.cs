@@ -21,8 +21,8 @@ namespace RPGCharacterAnims.Extensions
         /// <param name="trigger">The type of trigger.</param>
         public static void SetAnimatorTrigger(this Animator animator, AnimatorTrigger trigger)
         {
-			Debug.Log($"SetAnimatorTrigger: {trigger} - {( int )trigger}");
-			animator.SetInteger(AnimationParameters.TriggerNumber, (int)trigger);
+            Debug.Log($"SetAnimatorTrigger: {trigger} - {(int)trigger}");
+            animator.SetInteger(AnimationParameters.TriggerNumber, (int)trigger);
             animator.SetTrigger(AnimationParameters.Trigger);
         }
 
@@ -111,7 +111,7 @@ namespace RPGCharacterAnims.Extensions
         [Obsolete("This is for backwards compatibility with older trigger names.")]
         public static void LegacySetAnimationTrigger(this Animator animator, string trigger)
         {
-            var parsedTrigger = (AnimatorTrigger) Enum.Parse(typeof(AnimatorTrigger), trigger);
+            var parsedTrigger = (AnimatorTrigger)Enum.Parse(typeof(AnimatorTrigger), trigger);
             Debug.Log($"LegacyAnimationTrigger: {parsedTrigger} - {parsedTrigger}");
             SetAnimatorTrigger(animator, parsedTrigger);
         }
@@ -123,34 +123,34 @@ namespace RPGCharacterAnims.Extensions
         public static void DebugAnimatorParameters(this Animator animator)
         {
             Debug.Log("ANIMATOR SETTINGS---------------------------");
-			Debug.Log("Moving: " + animator.GetBool(AnimationParameters.Moving));
-			Debug.Log("Aiming: " + animator.GetBool(AnimationParameters.Aiming));
-			Debug.Log($"Weapon: {animator.GetInteger(AnimationParameters.Weapon)}");
-			Debug.Log($"WeaponSwitch: {animator.GetInteger(AnimationParameters.WeaponSwitch)}");
-			Debug.Log($"Side: {animator.GetInteger(AnimationParameters.Side)}");
-			Debug.Log($"LeftWeapon: {animator.GetInteger(AnimationParameters.LeftWeapon)}");
-			Debug.Log($"RightWeapon: {animator.GetInteger(AnimationParameters.RightWeapon)}");
-			Debug.Log("Jumping: " + animator.GetInteger(AnimationParameters.Jumping));
-			Debug.Log("Action: " + animator.GetInteger(AnimationParameters.Action));
-			Debug.Log("Velocity X: " + animator.GetFloat(AnimationParameters.VelocityX));
-			Debug.Log("Velocity Z: " + animator.GetFloat(AnimationParameters.VelocityZ));
-		}
+            Debug.Log("Moving: " + animator.GetBool(AnimationParameters.Moving));
+            Debug.Log("Aiming: " + animator.GetBool(AnimationParameters.Aiming));
+            Debug.Log($"Weapon: {animator.GetInteger(AnimationParameters.Weapon)}");
+            Debug.Log($"WeaponSwitch: {animator.GetInteger(AnimationParameters.WeaponSwitch)}");
+            Debug.Log($"Side: {animator.GetInteger(AnimationParameters.Side)}");
+            Debug.Log($"LeftWeapon: {animator.GetInteger(AnimationParameters.LeftWeapon)}");
+            Debug.Log($"RightWeapon: {animator.GetInteger(AnimationParameters.RightWeapon)}");
+            Debug.Log("Jumping: " + animator.GetInteger(AnimationParameters.Jumping));
+            Debug.Log("Action: " + animator.GetInteger(AnimationParameters.Action));
+            Debug.Log("Velocity X: " + animator.GetFloat(AnimationParameters.VelocityX));
+            Debug.Log("Velocity Z: " + animator.GetFloat(AnimationParameters.VelocityZ));
+        }
 
-		/// <summary>
-		/// Sets the animation state for weapons.
-		/// </summary>
-		/// <param name="weaponWeapon">Animator weapon number. Use AnimationData's AnimatorWeapon enum.</param>
-		/// <param name="weaponSwitch">Weapon switch. -2 leaves parameter unchanged.</param>
-		/// <param name="leftWeapon">Left weapon number. Use Weapon.cs enum.</param>
-		/// <param name="rightWeapon">Right weapon number. Use Weapon.cs enum.</param>
-		/// <param name="weaponSide">Weapon side: 0-None, 1-Left, 2-Right, 3-Dual.</param>
-		public static void SetWeapons(this Animator animator, AnimatorWeapon animatorWeapon, int weaponSwitch, Weapon leftWeapon, Weapon rightWeapon, Side weaponSide)
-		{
-			{ animator.SetInteger(AnimationParameters.Weapon, ( int )animatorWeapon); }
-			if (weaponSwitch != -2) { animator.SetInteger(AnimationParameters.WeaponSwitch, weaponSwitch); }
-			if (leftWeapon != Weapon.Unarmed) { animator.SetInteger(AnimationParameters.LeftWeapon, ( int )leftWeapon); }
-			if (rightWeapon != Weapon.Unarmed) { animator.SetInteger(AnimationParameters.RightWeapon, ( int )rightWeapon); }
-			if (weaponSide != Side.Unchanged) { animator.SetInteger(AnimationParameters.Side, ( int )weaponSide); }
-		}
-	}
+        /// <summary>
+        /// Sets the animation state for weapons.
+        /// </summary>
+        /// <param name="weaponWeapon">Animator weapon number. Use AnimationData's AnimatorWeapon enum.</param>
+        /// <param name="weaponSwitch">Weapon switch. -2 leaves parameter unchanged.</param>
+        /// <param name="leftWeapon">Left weapon number. Use Weapon.cs enum.</param>
+        /// <param name="rightWeapon">Right weapon number. Use Weapon.cs enum.</param>
+        /// <param name="weaponSide">Weapon side: 0-None, 1-Left, 2-Right, 3-Dual.</param>
+        public static void SetWeapons(this Animator animator, AnimatorWeapon animatorWeapon, int weaponSwitch, Weapon leftWeapon, Weapon rightWeapon, Side weaponSide)
+        {
+            { animator.SetInteger(AnimationParameters.Weapon, (int)animatorWeapon); }
+            if (weaponSwitch != -2) { animator.SetInteger(AnimationParameters.WeaponSwitch, weaponSwitch); }
+            if (leftWeapon != Weapon.Unarmed) { animator.SetInteger(AnimationParameters.LeftWeapon, (int)leftWeapon); }
+            if (rightWeapon != Weapon.Unarmed) { animator.SetInteger(AnimationParameters.RightWeapon, (int)rightWeapon); }
+            if (weaponSide != Side.Unchanged) { animator.SetInteger(AnimationParameters.Side, (int)weaponSide); }
+        }
+    }
 }

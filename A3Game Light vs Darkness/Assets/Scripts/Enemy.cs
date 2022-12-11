@@ -11,16 +11,17 @@ public class Enemy : GameBehaviour
 {
     public enum EnemyState
     {
-        Patrol, Chase, Attack, Hit, Die 
+        Patrol, Chase, Attack, Hit, Die
     }
 
     EnemyState enemyState;
-    
+
     public NavMeshAgent agent;
     public Transform player;
     public LayerMask whatIsGround, whatIsPlayer;
 
     public float health = 20;
+    float attackDmg = 3;
 
     //patrolling
     public Vector3 walkPoint;
@@ -30,12 +31,13 @@ public class Enemy : GameBehaviour
 
     //attacking
     public float timeBetweenAttacks = 20;
-    public float sightRange, attackRange,playerHitRange;
+    public float sightRange, attackRange, playerHitRange;
     public bool playerInSightRange, playerInAttackRange, enemyInHitRange;
     public bool alreadyAttacked = false;
     bool attackRangeRnd = false;
     bool attacking;
     bool hit;
+    Collider attackPlayerCollider;
 
     //states
     bool walking;
@@ -57,17 +59,21 @@ public class Enemy : GameBehaviour
     bool enterting;
 
 
+
+
+
     private void Awake()
     {
         player = GameObject.Find("PlayerAvatar").transform;
         agent = GetComponent<NavMeshAgent>();
         enemyAnimation = gameObject.GetComponent<Animator>();
+
     }
 
     private void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").transform;
- 
+
     }
 
     private void Update()
@@ -78,7 +84,7 @@ public class Enemy : GameBehaviour
         enemyInHitRange = Physics.CheckSphere(transform.position, playerHitRange, whatIsPlayer);
 
         //makes sure once enemy dies it cannot react to anything above
-        if(enemyState != EnemyState.Die && enemyState != EnemyState.Hit)
+        if (enemyState != EnemyState.Die && enemyState != EnemyState.Hit)
         {
             if (!playerInSightRange && !playerInAttackRange) enemyState = EnemyState.Patrol;
             if (playerInSightRange && !playerInAttackRange) enemyState = EnemyState.Chase;
@@ -86,7 +92,7 @@ public class Enemy : GameBehaviour
         }
 
         //print(enemyState);
-        
+
 
         switch (enemyState)
         {
@@ -104,12 +110,12 @@ public class Enemy : GameBehaviour
 
                 break;
             case EnemyState.Die:
-                agent.SetDestination(transform.position); 
+                agent.SetDestination(transform.position);
                 if (!deathAnimation)
                 {
                     StartCoroutine(Die());
                 }
-                
+
 
                 break;
 
@@ -130,7 +136,7 @@ public class Enemy : GameBehaviour
             enemyAnimation.SetBool("Walk Forward", true);
             gameObject.GetComponent<NavMeshAgent>().speed = 1;
         }
-            
+
 
         //calculate distance to walk point
         Vector3 distanceToWalkPoint = transform.position - walkPoint;
@@ -139,9 +145,9 @@ public class Enemy : GameBehaviour
         if (distanceToWalkPoint.magnitude < 1f)
         {
             enemyAnimation.SetBool("Run Forward", false);
-            float result = RandomFloatBetwenTwoFloats(0.5f,2f);
+            float result = RandomFloatBetwenTwoFloats(0.5f, 2f);
             yield return new WaitForSeconds(result);
-            walkPointSet = false;   
+            walkPointSet = false;
         }
     }
 
@@ -157,19 +163,19 @@ public class Enemy : GameBehaviour
         if (Physics.Raycast(walkPoint, -transform.up, 2f, whatIsGround))
         {
             walkPointSet = true;
-        }       
+        }
     }
 
     private void ChasePlayer()
     {
         enemyAnimation.SetBool("Walk Forward", false);
-        if(!attacking) enemyAnimation.SetBool("Run Forward", true);
+        if (!attacking) enemyAnimation.SetBool("Run Forward", true);
         gameObject.GetComponent<NavMeshAgent>().speed = 5;
 
         agent.SetDestination(player.position);
 
 
-        if( attackRangeRnd == false)
+        if (attackRangeRnd == false)
         {
             attackRange = RandomFloatBetwenTwoFloats(10f, 15);
             attackRangeRnd = true;
@@ -193,17 +199,17 @@ public class Enemy : GameBehaviour
 
         //make sure enemy doesnt move
         agent.SetDestination(transform.position);
-        
+
         gameObject.GetComponent<NavMeshAgent>().speed = 1;
 
         transform.LookAt(player.position);
-        transform.eulerAngles = new Vector3(0,transform.eulerAngles.y, 0);
+        transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
 
         if (orbiting)
         {
 
             OrbitPlayer();
-            
+
             int waitTime = 5;
             waitTime = RandomFloatBetwenTwoInts(5, 10);
             //print("Wait time: " + waitTime)
@@ -233,7 +239,7 @@ public class Enemy : GameBehaviour
 
             if (!enemyInHitRange && enterting)
             {
-                
+
                 gameObject.GetComponent<NavMeshAgent>().speed = 5;
                 agent.SetDestination(player.position);//transform.position = Vector3.MoveTowards(transform.position, player.transform.position, 0.05f);
                 yield return new WaitForSeconds(0.5f);
@@ -252,23 +258,26 @@ public class Enemy : GameBehaviour
                 transform.position = transform.position;
                 //print("eneted hit range");
 
-                if(!hit) //stab animation
+                if (!hit) //stab animation
                 {
                     StartCoroutine(PlayAnimationBool("Stab Attack"));
                     hit = true;
 
-                    // ADD ATTACK CODE IN HERE
+                    //ATTACK CODE
+
+                    _P.PlayerTakeDamage(attackDmg);
+
 
                 }
                 //yield return new WaitForSeconds(4);
 
-                if(hit)
+                if (hit)
                 {
                     enterting = false;
                     yield return new WaitForSeconds(1);
                     enemyAnimation.SetBool("Run Backward", true);
 
-                    transform.position = Vector3.MoveTowards(transform.position,preJumpPos,3 * Time.deltaTime);
+                    transform.position = Vector3.MoveTowards(transform.position, preJumpPos, 3 * Time.deltaTime);
                     //yield return new WaitForSeconds(1);
                     yield return new WaitForSeconds(0.5f);
                     float dist = Vector3.Distance(preJumpPos, transform.position);
@@ -277,22 +286,22 @@ public class Enemy : GameBehaviour
                     if (dist < 3)
                     {
                         enemyAnimation.SetBool("Run Backward", false);
-                        
+
                         alreadyAttacked = true;
                         Invoke(nameof(ResetAttack), timeBetweenAttacks);
-                        
+
                     }
                 }
             }
         }
 
-        if(alreadyAttacked)
+        if (alreadyAttacked)
         {
-            
+
             orbiting = true;
         }
 
-        
+
     }
 
     void OrbitPlayer()
@@ -314,14 +323,14 @@ public class Enemy : GameBehaviour
         if (rotate == 0) OrbitPlayerLeft(degreesPerSecond);
         if (rotate == 1) OrbitPlayerRight(degreesPerSecond);
 
-        
+
     }
 
 
     private void ResetOrbit()
     {
         orbiting = false;
-        
+
     }
 
     private void ResetAttack()
@@ -331,7 +340,7 @@ public class Enemy : GameBehaviour
         hit = false;
     }
     private void OrbitPlayerLeft(float _degreesPerSecond)
-    {  
+    {
         transform.RotateAround(player.transform.position, Vector3.up, _degreesPerSecond * Time.deltaTime);
         enemyAnimation.SetBool("Strafe Right", false);
         enemyAnimation.SetBool("Strafe Left", true);
@@ -350,24 +359,24 @@ public class Enemy : GameBehaviour
         if (health <= 0) enemyState = EnemyState.Die;
         else
         {
-            print("OW");
             health -= damage;
-            AnimationTrigger("Take Damage");
+            PlayAnimationTrigger("Take Damage");
             enemyState = EnemyState.Patrol;
         }
     }
 
     private void DestroyEnemy()
-    {        
+    {
         Destroy(gameObject);
     }
 
     IEnumerator Die()
     {
+        _P.lightingEnemyTargets.Remove(gameObject);
         //ensures this is only called once
         deathAnimation = true;
         agent.SetDestination(transform.position);
-        AnimationTrigger("Die");
+        PlayAnimationTrigger("Die");
 
         yield return new WaitForSeconds(6.5f);
 
@@ -379,12 +388,28 @@ public class Enemy : GameBehaviour
         if (other.gameObject.CompareTag("Sword"))
         {
             //only if player is attacking
-            if(_P.playerState == ThirdPersonMovement.PlayerState.Attack)
+            if (_P.playerState == ThirdPersonMovement.PlayerState.Attack)
             {
-                print("sword enter collision");
                 enemyState = EnemyState.Hit;
-                
-            }  
+
+            }
+        }
+
+        if (other.gameObject.CompareTag("LightingRange"))
+        {
+            _P.lightingEnemyTargets.Add(gameObject);
+        }
+
+
+
+    }
+
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.CompareTag("LightingRange"))
+        {
+            _P.lightingEnemyTargets.Remove(gameObject);
         }
     }
 

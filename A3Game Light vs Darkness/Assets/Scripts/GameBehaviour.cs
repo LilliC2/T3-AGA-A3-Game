@@ -9,23 +9,24 @@ public class GameBehaviour : MonoBehaviour
     protected static UIManager _UI { get { return UIManager.INSTANCE; } }
 
     protected static ThirdPersonMovement _P { get { return ThirdPersonMovement.INSTANCE; } }
-    //protected static AnimationManager _AM { get { return AnimationManager.INSTANCE; } }
+
+    protected static CameraController _CC { get { return CameraController.INSTANCE; } }
 
     public float RandomFloatBetwenTwoFloats(float _float1, float _float2)
     {
-        float result =Random.Range(_float1, _float2);
+        float result = Random.Range(_float1, _float2);
 
         return result;
     }
 
     public int RandomFloatBetwenTwoInts(int _int1, int _int2)
     {
-        int result = (int) Random.Range(_int1, _int2);
+        int result = (int)Random.Range(_int1, _int2);
 
         return result;
     }
 
-    public void AnimationTrigger(string _anim)
+    public void PlayAnimationTrigger(string _anim)
     {
         Animator animation;
         animation = GetComponent<Animator>();

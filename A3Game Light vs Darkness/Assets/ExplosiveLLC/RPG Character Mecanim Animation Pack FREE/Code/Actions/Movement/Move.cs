@@ -10,9 +10,9 @@ namespace RPGCharacterAnims.Actions
 
         public override bool CanStartAction(RPGCharacterController controller)
         {
-			return controller.canMove
-				&& controller.moveInput.sqrMagnitude > 0.1f
-				&& controller.maintainingGround;
+            return controller.canMove
+                && controller.moveInput.sqrMagnitude > 0.1f
+                && controller.maintainingGround;
         }
 
         protected override void _StartAction(RPGCharacterController controller, EmptyContext context)

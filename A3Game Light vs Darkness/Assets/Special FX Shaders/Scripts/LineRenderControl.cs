@@ -2,30 +2,31 @@
 using System.Collections;
 
 [ExecuteInEditMode]
-public class LineRenderControl : MonoBehaviour {
+public class LineRenderControl : MonoBehaviour
+{
 
-	public GameObject target;
-	public Material mat;
+    public GameObject target;
+    public Material mat;
 
-	private LineRenderer lR;
-	private Renderer rend;
+    private LineRenderer lR;
+    private Renderer rend;
 
-	void Start() 
-	{
-		lR = GetComponent<LineRenderer> ();
-		rend = GetComponent<Renderer>();
-	}
-	
-	void Update() 
-	{
-		float dis = Vector3.Distance (transform.position, target.transform.position);
-		lR.SetPosition (1, new Vector3 (0, 0, dis));
+    void Start()
+    {
+        lR = GetComponent<LineRenderer>();
+        rend = GetComponent<Renderer>();
+    }
 
-		mat.SetTextureScale("_DisTex", new Vector2 (dis,1));
-		rend.material = mat;
-		//rend.material.SetTextureScale ("_DisTex", new Vector2 (dis,1));
-	
+    void Update()
+    {
+        float dis = Vector3.Distance(transform.position, target.transform.position);
+        lR.SetPosition(1, new Vector3(0, 0, dis));
 
-		transform.LookAt (target.transform.position);
-	}
+        mat.SetTextureScale("_DisTex", new Vector2(dis, 1));
+        rend.material = mat;
+        //rend.material.SetTextureScale ("_DisTex", new Vector2 (dis,1));
+
+
+        transform.LookAt(target.transform.position);
+    }
 }

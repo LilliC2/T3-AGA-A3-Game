@@ -1,43 +1,48 @@
 ﻿using UnityEngine;
+using System.Collections;
 
-public class PlayerInputController:MonoBehaviour
+public class PlayerInputController : MonoBehaviour
 {
-	public PlayerInput Current;
-	public Vector2 RightStickMultiplier = new Vector2(3, -1.5f);
 
-	private void Start()
-	{
-		Current = new PlayerInput();
-	}
+    public PlayerInput Current;
+    public Vector2 RightStickMultiplier = new Vector2(3, -1.5f);
 
-	private void Update()
-	{
-		// Retrieve our current WASD or Arrow Key input.
-		// Using GetAxisRaw removes any kind of gravity or filtering being applied to the input
-		// Ensuring that we are getting either -1, 0 or 1.
-		Vector3 moveInput = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
+    // Use this for initialization
+    void Start()
+    {
+        Current = new PlayerInput();
+    }
 
-		Vector2 mouseInput = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+    void Update()
+    {
 
-		Vector2 rightStickInput = new Vector2(Input.GetAxisRaw("FacingHorizontal"), Input.GetAxisRaw("FacingVertical"));
+        // Retrieve our current WASD or Arrow Key input
+        // Using GetAxisRaw removes any kind of gravity or filtering being applied to the input
+        // Ensuring that we are getting either -1, 0 or 1
+        Vector3 moveInput = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
 
-		// Pass rightStick values in place of mouse when non-zero.
-		mouseInput.x = rightStickInput.x != 0 ? rightStickInput.x * RightStickMultiplier.x : mouseInput.x;
-		mouseInput.y = rightStickInput.y != 0 ? rightStickInput.y * RightStickMultiplier.y : mouseInput.y;
+        Vector2 mouseInput = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
 
-		bool jumpInput = Input.GetButtonDown("Jump");
+        Vector2 rightStickInput = new Vector2(Input.GetAxisRaw("AimHorizontal"), Input.GetAxisRaw("AimVertical"));
 
-		Current = new PlayerInput() {
-			MoveInput = moveInput,
-			MouseInput = mouseInput,
-			JumpInput = jumpInput
-		};
-	}
+        // pass rightStick values in place of mouse when non-zero
+        mouseInput.x = rightStickInput.x != 0 ? rightStickInput.x * RightStickMultiplier.x : mouseInput.x;
+        mouseInput.y = rightStickInput.y != 0 ? rightStickInput.y * RightStickMultiplier.y : mouseInput.y;
+
+        bool jumpInput = Input.GetButtonDown("Jump");
+
+        Current = new PlayerInput()
+        {
+            MoveInput = moveInput,
+            MouseInput = mouseInput,
+            JumpInput = jumpInput
+        };
+    }
 }
 
 public struct PlayerInput
 {
-	public Vector3 MoveInput;
-	public Vector2 MouseInput;
-	public bool JumpInput;
+    public Vector3 MoveInput;
+    public Vector2 MouseInput;
+    public bool JumpInput;
 }

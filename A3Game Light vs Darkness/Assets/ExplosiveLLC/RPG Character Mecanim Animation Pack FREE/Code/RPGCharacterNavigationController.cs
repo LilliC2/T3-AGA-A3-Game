@@ -13,10 +13,10 @@ namespace RPGCharacterAnims
         private RPGCharacterMovementController rpgCharacterMovementController;
         private Animator animator;
 
-		// Variables.
+        // Variables.
         [HideInInspector] public bool isNavigating;
-		public float moveSpeed = 7.0f;
-		public float rotationSpeed = 1.0f;
+        public float moveSpeed = 7.0f;
+        public float rotationSpeed = 1.0f;
 
         void Awake()
         {
@@ -28,7 +28,7 @@ namespace RPGCharacterAnims
             rpgCharacterController = GetComponent<RPGCharacterController>();
             rpgCharacterMovementController = GetComponent<RPGCharacterMovementController>();
             rpgCharacterController.SetHandler(HandlerTypes.Navigation, new Actions.Navigation(this));
-		}
+        }
 
         void Start()
         {
@@ -39,63 +39,67 @@ namespace RPGCharacterAnims
             Debug.Break();
         }
 
-		void Update()
-		{
-			if (isNavigating) {
-				RotateTowardsMovementDir();
-
-				// Nav mesh speed compared to RPGCharacterMovementController speed is 7-1.
-				navMeshAgent.speed = moveSpeed * 7;
-				if (navMeshAgent.velocity.sqrMagnitude > 0) {
-					animator.SetBool(AnimationParameters.Moving, true);
-
-					// Default run speed is 7 for navigation, so we divide by that.
-					animator.SetFloat(AnimationParameters.VelocityZ, moveSpeed * (1 / (7 / navMeshAgent.speed)));
-				}
-				else { animator.SetFloat(AnimationParameters.VelocityZ, 0); }
-			}
-
-			// Disable the navMeshAgent once the character has reached its destination and set the animation speed to 0.
-			if (isNavigating && !navMeshAgent.hasPath) {
-				StopNavigating();
-				animator.SetFloat(AnimationParameters.VelocityZ, 0f);
-			}
-		}
-
-		/// <summary>
-		/// Navigate to the destination using Unity's NavMeshAgent.
-		/// </summary>
-		/// <param name="destination">Point in world space to navigate to.</param>
-		public void MeshNavToPoint(Vector3 destination)
+        void Update()
         {
-			navMeshAgent.enabled = true;
-			navMeshAgent.SetDestination(destination);
-			isNavigating = true;
-			if (rpgCharacterMovementController != null) { rpgCharacterMovementController.enabled = false; }
-		}
+            if (isNavigating)
+            {
+                RotateTowardsMovementDir();
+
+                // Nav mesh speed compared to RPGCharacterMovementController speed is 7-1.
+                navMeshAgent.speed = moveSpeed * 7;
+                if (navMeshAgent.velocity.sqrMagnitude > 0)
+                {
+                    animator.SetBool(AnimationParameters.Moving, true);
+
+                    // Default run speed is 7 for navigation, so we divide by that.
+                    animator.SetFloat(AnimationParameters.VelocityZ, moveSpeed * (1 / (7 / navMeshAgent.speed)));
+                }
+                else { animator.SetFloat(AnimationParameters.VelocityZ, 0); }
+            }
+
+            // Disable the navMeshAgent once the character has reached its destination and set the animation speed to 0.
+            if (isNavigating && !navMeshAgent.hasPath)
+            {
+                StopNavigating();
+                animator.SetFloat(AnimationParameters.VelocityZ, 0f);
+            }
+        }
+
+        /// <summary>
+        /// Navigate to the destination using Unity's NavMeshAgent.
+        /// </summary>
+        /// <param name="destination">Point in world space to navigate to.</param>
+        public void MeshNavToPoint(Vector3 destination)
+        {
+            navMeshAgent.enabled = true;
+            navMeshAgent.SetDestination(destination);
+            isNavigating = true;
+            if (rpgCharacterMovementController != null) { rpgCharacterMovementController.enabled = false; }
+        }
 
         /// <summary>
         /// Stop navigating to the current destination.
         /// </summary>
         public void StopNavigating()
         {
-			isNavigating = false;
-			navMeshAgent.enabled = false;
-			if (rpgCharacterMovementController != null) { rpgCharacterMovementController.enabled = true; }
-		}
+            isNavigating = false;
+            navMeshAgent.enabled = false;
+            if (rpgCharacterMovementController != null) { rpgCharacterMovementController.enabled = true; }
+        }
 
         private void RotateTowardsMovementDir()
         {
-			if (navMeshAgent.velocity.sqrMagnitude > 0.01f) {
-				transform.rotation = Quaternion.Slerp(transform.rotation,
-					Quaternion.LookRotation(navMeshAgent.velocity),
-					Time.deltaTime * navMeshAgent.angularSpeed * rotationSpeed);
+            if (navMeshAgent.velocity.sqrMagnitude > 0.01f)
+            {
+                transform.rotation = Quaternion.Slerp(transform.rotation,
+                    Quaternion.LookRotation(navMeshAgent.velocity),
+                    Time.deltaTime * navMeshAgent.angularSpeed * rotationSpeed);
 
-				// Keep X and Z rotation at 0.
-				Quaternion q = transform.rotation;
-				q.eulerAngles = new Vector3(0, q.eulerAngles.y, 0);
-				transform.rotation = q;
-			}
-		}
+                // Keep X and Z rotation at 0.
+                Quaternion q = transform.rotation;
+                q.eulerAngles = new Vector3(0, q.eulerAngles.y, 0);
+                transform.rotation = q;
+            }
+        }
     }
 }

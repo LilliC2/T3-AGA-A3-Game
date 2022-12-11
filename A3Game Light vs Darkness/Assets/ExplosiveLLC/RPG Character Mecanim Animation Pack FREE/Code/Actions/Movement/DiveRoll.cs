@@ -15,7 +15,7 @@ namespace RPGCharacterAnims.Actions
         {
             controller.DiveRoll(rollType);
             movement.currentState = CharacterState.DiveRoll;
-		}
+        }
 
         public override bool IsActive()
         { return movement.currentState != null && (CharacterState)movement.currentState == CharacterState.DiveRoll; }
