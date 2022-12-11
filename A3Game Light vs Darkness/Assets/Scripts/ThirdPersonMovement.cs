@@ -88,8 +88,6 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
     [Header("Lighting Attack")]
     public LineRenderer lightingBounce;
     public List<GameObject> lightingEnemyTargets;
-    Vector3[] vp; //will change name
-    int seg = 20; //segements?
 
 
 
@@ -117,6 +115,7 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
 
 
         //print(playerState);
+
 
         switch (hookshotState)
         {
@@ -399,8 +398,6 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
 
         //moves player forward each attack animation
 
-        //this.transform.position = transform.forward * 2;
-
 
         //loops attack cycle after final animation in cycle is played
 
@@ -411,8 +408,6 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
             attackTime = 0;
 
         }
-
-
 
 
     }
@@ -427,7 +422,9 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
 
                 if (raycastHit.collider.CompareTag("HookPoint"))
                 {
-                    debugCube.transform.position = raycastHit.point;
+                    print("Swing");
+
+                    //debugCube.transform.position = raycastHit.point;
                     hookshotPosition = raycastHit.point;
                     hookshotSize = 0f;
                     hookshotState = HookshotState.HookshotThrown;
@@ -439,19 +436,6 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
 
     IEnumerator HandleHookshotThrown()
     {
-        //hookshotTransform.LookAt(hookshotPosition);
-
-        //float hookShotThrowSpeed = 10f;
-        //hookshotSize += hookShotThrowSpeed * Time.deltaTime;
-        ////increases hookshot object 
-        //hookshotTransform.localScale = new Vector3(0.05f, 0.05f, hookshotSize);
-
-        ////when hookshot reacehs position
-        //if(hookshotSize >= Vector3.Distance(transform.position, hookshotPosition))
-        //{
-        //    hookshotState = HookshotState.HookshotFlying;
-        //}
-
         hookshotLine.SetPosition(0, hookshotTransform.position);
         hookshotLine.SetPosition(1, hookshotPosition);
         yield return new WaitForSeconds(0.5f);
@@ -482,13 +466,11 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
         {
             //reached pos
 
-
             hookshotState = HookshotState.Normal;
             ResetGravity();
 
             //changes camera back when we hit the ground
             StartCoroutine(ResetCameraCheck());
-
 
         }
 
@@ -514,7 +496,7 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
     {
         print("Player took damage");
         playerHealth -= _damage;
-        PlayAnimationTrigger("TakeDamage");
+        //PlayAnimationTrigger("TakeDamage");
     }
 
     private bool TestInputDownHookshot()
