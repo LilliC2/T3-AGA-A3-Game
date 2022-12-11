@@ -15,21 +15,19 @@ public class Crystals : GameBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        print(collision);
-
-        if(collision.gameObject.CompareTag("Sword"))
+        if (collision.gameObject.CompareTag("Sword"))
         {
             //only take damage if player is attacking
             if (_P.playerState == ThirdPersonMovement.PlayerState.Attack)
             {
-                StartCoroutine( GlowStartUp());
+                StartCoroutine(GlowStartUp());
             }
-        }    
+        }
     }
 
     IEnumerator GlowStartUp()
     {
-        AnimationTrigger("LightUp");
+        PlayAnimationTrigger("LightUp");
         yield return new WaitForSeconds(1);
         anim.SetBool("Glow", true);
     }
