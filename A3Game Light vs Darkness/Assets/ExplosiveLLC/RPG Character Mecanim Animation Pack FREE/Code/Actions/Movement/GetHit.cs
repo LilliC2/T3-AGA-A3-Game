@@ -25,14 +25,12 @@ namespace RPGCharacterAnims.Actions
             var force = context.force;
             var variableForce = context.variableForce;
 
-            if (hitNumber == -1)
-            {
+            if (hitNumber == -1) {
                 hitNumber = (int)AnimationVariations.Hits.TakeRandom();
                 direction = AnimationData.HitDirection((HitType)hitNumber);
                 direction = controller.transform.rotation * direction;
             }
-            else
-            {
+			else {
                 if (context.relative) { direction = controller.transform.rotation * direction; }
             }
 

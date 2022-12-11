@@ -10,8 +10,7 @@ namespace RPGCharacterAnims
 
         void Update()
         {
-            if (character != null)
-            {
+            if (character != null) {
                 RPGCharacterController controller = character.GetComponent<RPGCharacterController>();
                 controller.SetJumpInput(Vector3.up);
                 controller.TryStartAction(HandlerTypes.Jump);
@@ -22,21 +21,19 @@ namespace RPGCharacterAnims
         {
             RPGCharacterController controller = collide.gameObject.GetComponent<RPGCharacterController>();
 
-            if (controller != null)
-            {
+            if (controller != null) {
                 character = collide.gameObject;
 
                 RPGCharacterMovementController movement = character.GetComponent<RPGCharacterMovementController>();
                 oldJumpSpeed = movement.jumpSpeed;
                 movement.jumpSpeed = oldJumpSpeed * 2f;
-                Debug.Log("Trampoline!");
-            }
+				Debug.Log("Trampoline!");
+			}
         }
 
         private void OnTriggerExit(Collider collide)
         {
-            if (collide.gameObject == character)
-            {
+            if (collide.gameObject == character) {
                 RPGCharacterMovementController movement = character.GetComponent<RPGCharacterMovementController>();
                 movement.jumpSpeed = oldJumpSpeed;
                 character = null;

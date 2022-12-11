@@ -13,11 +13,9 @@ namespace RPGCharacterAnims
         {
             controller = collide.gameObject.GetComponent<RPGCharacterController>();
 
-            if (controller != null)
-            {
+            if (controller != null) {
                 oldJumpHandler = controller.GetHandler(HandlerTypes.Jump);
-                controller.SetHandler(HandlerTypes.Jump, new SimpleActionHandler(() =>
-                {
+                controller.SetHandler(HandlerTypes.Jump, new SimpleActionHandler(() => {
                     Debug.Log("Can't jump!");
                     controller.EndAction(HandlerTypes.Jump);
                 }, () => { }));
@@ -26,8 +24,7 @@ namespace RPGCharacterAnims
 
         private void OnTriggerExit(Collider collide)
         {
-            if (collide.gameObject == controller.gameObject)
-            {
+            if (collide.gameObject == controller.gameObject) {
                 controller.SetHandler(HandlerTypes.Jump, oldJumpHandler);
                 controller = null;
                 oldJumpHandler = null;

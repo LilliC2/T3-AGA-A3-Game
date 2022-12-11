@@ -22,12 +22,11 @@ namespace RPGCharacterAnims
 
         public void Run(IEnumerator coroutine)
         {
-            if (numActive < maxActive)
-            {
+            if (numActive < maxActive) {
                 var runner = CoroutineRunner(coroutine);
                 coroutineStarter(runner);
             }
-            else { queue.Enqueue(coroutine); }
+			else { queue.Enqueue(coroutine); }
         }
 
         public void RunCallback(System.Action callback)
@@ -44,8 +43,7 @@ namespace RPGCharacterAnims
             numActive++;
             while (coroutine.MoveNext()) { yield return coroutine.Current; }
             numActive--;
-            if (queue.Count > 0)
-            {
+            if (queue.Count > 0) {
                 var next = queue.Dequeue();
                 Run(next);
             }
