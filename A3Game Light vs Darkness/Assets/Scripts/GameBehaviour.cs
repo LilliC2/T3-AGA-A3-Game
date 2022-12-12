@@ -9,7 +9,7 @@ public class GameBehaviour : MonoBehaviour
     protected static UIManager _UI { get { return UIManager.INSTANCE; } }
 
     protected static ThirdPersonMovement _P { get { return ThirdPersonMovement.INSTANCE; } }
-    //protected static AnimationManager _AM { get { return AnimationManager.INSTANCE; } }
+    protected static CameraSwap _CS { get { return CameraSwap.INSTANCE; } }
 
     public float RandomFloatBetwenTwoFloats(float _float1, float _float2)
     {

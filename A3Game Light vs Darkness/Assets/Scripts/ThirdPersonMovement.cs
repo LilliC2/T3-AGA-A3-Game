@@ -13,12 +13,21 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
     public CharacterController characterController;
     public Transform cam;
     public float speed = 6f;
+    Vector3 direction;
+    public bool fpsMode;
 
     public enum PlayerState
     {
         Idle, Run, Attack, Die, Jump, Fall
     }
 
+    public enum PlayerMovement
+    {
+        ThirdPerson, FPS
+
+    }
+
+    public PlayerMovement playerMovement; 
     public PlayerState playerState;
 
     //directinal
@@ -93,16 +102,7 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
 
 
 
-        //WASD inputs
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
-        Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
-
-
-        if (direction.magnitude >= 0.1f)
-        {
-            playerState = PlayerState.Run;
-        }
+        
 
         //jump animations and movement
         if (Input.GetButtonDown("Jump") && isGrounded)
@@ -125,6 +125,45 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
 
             playerState = PlayerState.Idle;
         }
+
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            fpsMode = !fpsMode;
+            print(fpsMode);
+        }
+
+        if (fpsMode)
+        {
+            playerMovement = PlayerMovement.FPS;
+            _CS.fPCameraOn();
+        }
+        else if (!fpsMode)
+        {
+            _CS.followPlayerCameraOn();
+            playerMovement = PlayerMovement.ThirdPerson;
+        }
+
+
+
+        switch (playerMovement)
+        {
+            case PlayerMovement.ThirdPerson:
+                //WASD inputs
+                float horizontal = Input.GetAxisRaw("Horizontal");
+                float vertical = Input.GetAxisRaw("Vertical");
+                direction = new Vector3(horizontal, 0f, vertical).normalized;
+
+
+                if (direction.magnitude >= 0.1f)
+                {
+                    playerState = PlayerState.Run;
+                }
+                break;
+            case PlayerMovement.FPS:
+                //cannot move
+                break;
+        }
+
 
         switch (playerState)
         {
