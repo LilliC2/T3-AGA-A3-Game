@@ -8,6 +8,8 @@ TagManager:
   - Sword
   - PlayerSword
   - Enemy
+  - HookPoint
+  - LightningRange
   layers:
   - Default
   - TransparentFX

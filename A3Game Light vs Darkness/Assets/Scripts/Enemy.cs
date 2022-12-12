@@ -386,7 +386,27 @@ public class Enemy : GameBehaviour
                 
             }  
         }
+
+        print(other);
+
+        if (other.gameObject.CompareTag("LightningRange"))
+        {
+            print("Added to range");
+            _P.lightingEnemyTargets.Add(gameObject);
+        }
+
+
     }
+
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.CompareTag("LightningRange"))
+        {
+            _P.lightingEnemyTargets.Remove(gameObject);
+        }
+    }
+
 
 
     //visualise sight range

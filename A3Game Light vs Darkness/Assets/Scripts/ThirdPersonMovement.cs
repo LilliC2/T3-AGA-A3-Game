@@ -73,6 +73,11 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
     public LineRenderer hookshotLine;
     public Transform hookshotTransform;
 
+    [Header("Lightning Attack")]
+    public LineRenderer lightingBounce;
+    public List<GameObject> lightingEnemyTargets;
+
+
     private void Start()
     {
         UnityEngine.Cursor.lockState = CursorLockMode.None;
@@ -175,6 +180,10 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
                         float vertical = Input.GetAxisRaw("Vertical");
                         direction = new Vector3(horizontal, 0f, vertical).normalized;
 
+                        if (Input.GetButtonDown("Jump") && isGrounded)
+                        {
+                            playerState = PlayerState.Jump;
+                        }
 
                         if (direction.magnitude >= 0.1f)
                         {
@@ -225,6 +234,8 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
                             characterController.Move(moveDir.normalized * speed * Time.deltaTime);
 
                         }
+
+                        
 
                         //slowly increase speed until max when running
                         if (running)
