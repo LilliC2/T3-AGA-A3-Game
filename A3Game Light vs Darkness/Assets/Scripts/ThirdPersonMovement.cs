@@ -267,7 +267,6 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
 
                         if (!isGrounded)
                         {
-                            velocity.y += gravity * Time.deltaTime;
                             playerState = PlayerState.Fall;
                         }
 

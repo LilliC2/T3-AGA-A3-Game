@@ -9,7 +9,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1305964118088936, guid: 5f285e9508d4e3f4488b284bb80a0b9b, type: 3}
       propertyPath: m_Name
-      value: GlowCrystals
+      value: GlowCrystals Variant
       objectReference: {fileID: 0}
     - target: {fileID: 4806575365483738, guid: 5f285e9508d4e3f4488b284bb80a0b9b, type: 3}
       propertyPath: m_LocalPosition.y
@@ -49,15 +49,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4981853204179252, guid: 5f285e9508d4e3f4488b284bb80a0b9b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 10.417064
+      value: 13.2
       objectReference: {fileID: 0}
     - target: {fileID: 4981853204179252, guid: 5f285e9508d4e3f4488b284bb80a0b9b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.04085493
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 4981853204179252, guid: 5f285e9508d4e3f4488b284bb80a0b9b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.13316488
+      value: 48.1
       objectReference: {fileID: 0}
     - target: {fileID: 4981853204179252, guid: 5f285e9508d4e3f4488b284bb80a0b9b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -148,10 +148,10 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 1.78
-  m_Height: 3.68
+  m_Radius: 1.8944678
+  m_Height: 5.204257
   m_Direction: 1
-  m_Center: {x: -0.22, y: 1.77, z: 0.51}
+  m_Center: {x: -0.22000001, y: 2.5321295, z: 0.39446795}
 --- !u!95 &2145261848
 Animator:
   serializedVersion: 4
