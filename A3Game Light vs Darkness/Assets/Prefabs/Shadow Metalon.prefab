@@ -1946,7 +1946,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4826279280364273954}
   - component: {fileID: 5329262914257441596}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Area Light (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1979,7 +1979,7 @@ Light:
   serializedVersion: 10
   m_Type: 3
   m_Shape: 0
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.57597756, g: 0.09583755, b: 0.8207547, a: 1}
   m_Intensity: 5
   m_Range: 10
   m_SpotAngle: 30
@@ -2040,7 +2040,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8076031818577065098}
   - component: {fileID: 8507531238686638708}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Area Light (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2073,7 +2073,7 @@ Light:
   serializedVersion: 10
   m_Type: 3
   m_Shape: 0
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.57597756, g: 0.09583755, b: 0.8207547, a: 1}
   m_Intensity: 5
   m_Range: 10
   m_SpotAngle: 30
@@ -2134,7 +2134,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5343267491339464873}
   - component: {fileID: 6858693339138061786}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Area Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2167,7 +2167,7 @@ Light:
   serializedVersion: 10
   m_Type: 3
   m_Shape: 0
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.57597756, g: 0.09583755, b: 0.8207547, a: 1}
   m_Intensity: 5
   m_Range: 10
   m_SpotAngle: 30
@@ -2228,7 +2228,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2238385491617178467}
   - component: {fileID: 959602682150525385}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Area Light (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2261,7 +2261,7 @@ Light:
   serializedVersion: 10
   m_Type: 3
   m_Shape: 0
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.57597756, g: 0.09583755, b: 0.8207547, a: 1}
   m_Intensity: 5
   m_Range: 10
   m_SpotAngle: 30
