@@ -267,6 +267,7 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
 
                         if (!isGrounded)
                         {
+                            velocity.y += gravity * Time.deltaTime;
                             playerState = PlayerState.Fall;
                         }
 
@@ -501,7 +502,8 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
 
     public void PlayerTakeDamage(float damage)
     {
-
+        playerHealth -= damage;
+        AnimationTrigger("Hit");
     }
 
 
