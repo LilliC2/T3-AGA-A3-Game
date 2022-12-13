@@ -21,6 +21,7 @@ public class Enemy : GameBehaviour
     public LayerMask whatIsGround, whatIsPlayer;
 
     public float health = 20;
+    float attack = 3;
 
     //patrolling
     public Vector3 walkPoint;
@@ -36,6 +37,7 @@ public class Enemy : GameBehaviour
     bool attackRangeRnd = false;
     bool attacking;
     bool hit;
+    bool hitPlayer;
 
     //states
     bool walking;
@@ -255,9 +257,16 @@ public class Enemy : GameBehaviour
                 if(!hit) //stab animation
                 {
                     StartCoroutine(PlayAnimationBool("Stab Attack"));
-                    hit = true;
 
                     // ADD ATTACK CODE IN HERE
+                    if (hitPlayer)
+                    {
+                        print("ENTERED HIT PLAYER");
+                        _P.PlayerTakeDamage(attack);
+                    }
+                    hit = true;
+
+                    
 
                 }
                 //yield return new WaitForSeconds(4);
@@ -350,7 +359,6 @@ public class Enemy : GameBehaviour
         if (health <= 0) enemyState = EnemyState.Die;
         else
         {
-            print("OW");
             health -= damage;
             AnimationTrigger("Take Damage");
             enemyState = EnemyState.Patrol;
@@ -381,21 +389,25 @@ public class Enemy : GameBehaviour
             //only if player is attacking
             if(_P.playerState == ThirdPersonMovement.PlayerState.Attack)
             {
-                print("sword enter collision");
                 enemyState = EnemyState.Hit;
                 
             }  
         }
 
-        print(other);
-
         if (other.gameObject.CompareTag("LightningRange"))
         {
-            print("Added to range");
             _P.lightingEnemyTargets.Add(gameObject);
         }
 
+        
 
+        if(other.gameObject.CompareTag("Player"))
+        {
+            hitPlayer = true;
+            print("Bool hitplayer is " + hitPlayer);
+        }
+
+        print("Collision with " + other);
     }
 
 
@@ -404,6 +416,11 @@ public class Enemy : GameBehaviour
         if (other.gameObject.CompareTag("LightningRange"))
         {
             _P.lightingEnemyTargets.Remove(gameObject);
+        }
+
+        if (other.gameObject.CompareTag("Player"))
+        {
+            //hitPlayer = false;
         }
     }
 

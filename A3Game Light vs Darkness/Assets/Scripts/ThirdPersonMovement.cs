@@ -502,6 +502,7 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
 
     public void PlayerTakeDamage(float damage)
     {
+        print("PlayerHit");
         playerHealth -= damage;
         AnimationTrigger("Hit");
     }
