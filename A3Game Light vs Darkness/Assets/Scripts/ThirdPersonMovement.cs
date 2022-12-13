@@ -203,13 +203,14 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
                         //if idle slowly decrease speed to 0
                         if (idle)
                         {
+                            this.velocity = transform.position * 0;
                             speed = speed - 20 * Time.deltaTime;
                             if (speed < 0) speed = 0;
                         }
 
                         break;
                     case PlayerState.Run:
-
+                        this.velocity = transform.position * 0;
                         anim.SetFloat("Speed", speed);
 
                         if (direction.magnitude >= 0.1f)
@@ -475,7 +476,12 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
 
         //moves player forward each attack animation
 
-        //this.transform.position = transform.forward * 2;
+        if(attackTime > 20)
+        {
+            this.velocity = transform.forward * 2;
+        }
+
+        
 
 
         //loops attack cycle after final animation in cycle is played
@@ -493,7 +499,10 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
 
     }
 
-    
+    public void PlayerTakeDamage(float damage)
+    {
+
+    }
 
 
     public void Hit()
