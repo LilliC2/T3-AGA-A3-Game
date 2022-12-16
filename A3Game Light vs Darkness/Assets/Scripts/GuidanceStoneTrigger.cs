@@ -49,6 +49,7 @@ public class GuidanceStoneTrigger : GameBehaviour
             string myStone = guidanceStone.name;
             string text = _GSM.FindText(myStone);
             _UI.GuidanceStoneUpdate(text);
+            _GSM.StartGS();
 
         }
     }

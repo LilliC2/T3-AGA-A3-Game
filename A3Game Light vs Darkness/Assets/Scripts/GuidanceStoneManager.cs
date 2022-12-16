@@ -7,10 +7,14 @@ public class GuidanceStoneManager : Singleton<GuidanceStoneManager>
     public List<GameObject> guidanceStonesList;
     public string[] guidanceStoneText;
     int index;
+    public Animator guidanceStoneAnim;
+
 
     // Start is called before the first frame update
     void Start()
     {
+        guidanceStoneAnim.GetComponent<Animator>();
+
         guidanceStonesList.Add(GameObject.FindWithTag("GuidanceStone"));
         
         guidanceStoneText = new string[10];
@@ -40,6 +44,22 @@ public class GuidanceStoneManager : Singleton<GuidanceStoneManager>
         print(guidanceStoneText[index]);
 
         return guidanceStoneText[index];
+    }
+
+    IEnumerator GuidanceStoneStartUp()
+    {
+        print("guidance start up");
+
+        AnimationTrigger("StoneOn");
+
+        yield return new WaitForSeconds(4);
+
+        guidanceStoneAnim.SetTrigger("StoneOff");
+    }
+
+    public void StartGS()
+    {
+        StartCoroutine(GuidanceStoneStartUp());
     }
 
 }

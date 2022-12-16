@@ -10,7 +10,7 @@ public class GameBehaviour : MonoBehaviour
 
     protected static ThirdPersonMovement _P { get { return ThirdPersonMovement.INSTANCE; } }
     protected static CameraSwap _CS { get { return CameraSwap.INSTANCE; } }
-
+    protected static BossFightManager _BF { get { return BossFightManager.INSTANCE; } }
     protected static GuidanceStoneManager _GSM { get { return GuidanceStoneManager.INSTANCE; } }
 
     public float RandomFloatBetwenTwoFloats(float _float1, float _float2)
