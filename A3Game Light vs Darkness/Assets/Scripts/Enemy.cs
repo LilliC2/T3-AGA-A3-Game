@@ -376,7 +376,7 @@ public class Enemy : GameBehaviour
         deathAnimation = true;
         agent.SetDestination(transform.position);
         AnimationTrigger("Die");
-
+        _P.lightingEnemyTargets.Remove(gameObject);
         yield return new WaitForSeconds(6.5f);
 
         DestroyEnemy();
@@ -399,15 +399,16 @@ public class Enemy : GameBehaviour
             _P.lightingEnemyTargets.Add(gameObject);
         }
 
-        
-
-        if(other.gameObject.CompareTag("Player"))
+        if(enemyState != EnemyState.Die)
         {
-            hitPlayer = true;
-            print("Bool hitplayer is " + hitPlayer);
+            if (other.gameObject.CompareTag("Player"))
+            {
+                hitPlayer = true;
+            }
         }
 
-        print("Collision with " + other);
+        
+
     }
 
 

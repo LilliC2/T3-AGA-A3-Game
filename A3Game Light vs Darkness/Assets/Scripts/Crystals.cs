@@ -5,10 +5,12 @@ using UnityEngine;
 public class Crystals : GameBehaviour
 {
     Animator anim;
+    public bool lit;
 
     // Start is called before the first frame update
     void Start()
     {
+        lit =false;
         anim = GetComponent<Animator>();
     }
 
@@ -29,8 +31,14 @@ public class Crystals : GameBehaviour
 
     IEnumerator GlowStartUp()
     {
+        lit=true;
         AnimationTrigger("LightUp");
         yield return new WaitForSeconds(1);
         anim.SetBool("Glow", true);
+    }
+
+    public bool LitCheck()
+    {
+        return lit;
     }
 }

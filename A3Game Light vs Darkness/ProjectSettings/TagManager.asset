@@ -11,6 +11,7 @@ TagManager:
   - HookPoint
   - LightningRange
   - Crystal
+  - GuidanceStone
   layers:
   - Default
   - TransparentFX

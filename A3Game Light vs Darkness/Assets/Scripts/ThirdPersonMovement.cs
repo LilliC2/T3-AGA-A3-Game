@@ -27,6 +27,8 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
         Normal,HookshotFlying,HookshotThrown
     }
 
+    
+
     [Header("Enums")]
     public PlayerMovement playerMovement; 
     public PlayerState playerState;
