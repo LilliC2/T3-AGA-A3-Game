@@ -207,7 +207,7 @@ public class Enemy : GameBehaviour
             OrbitPlayer();
             
             int waitTime = 5;
-            waitTime = RandomFloatBetwenTwoInts(5, 10);
+            waitTime = RandomIntBetwenTwoInts(5, 10);
             //print("Wait time: " + waitTime)
 
             yield return new WaitForSeconds(waitTime);
@@ -314,7 +314,7 @@ public class Enemy : GameBehaviour
         if (!rotateDetermined)
         {
             //determine left or right
-            rotate = RandomFloatBetwenTwoInts(0, 2);
+            rotate = RandomIntBetwenTwoInts(0, 2);
             //determine speed of rotation
             degreesPerSecond = RandomFloatBetwenTwoFloats(9, 21);
             rotateDetermined = true;
@@ -396,7 +396,12 @@ public class Enemy : GameBehaviour
 
         if (other.gameObject.CompareTag("LightningRange"))
         {
-            _P.lightingEnemyTargets.Add(gameObject);
+            if (_P.playerState == ThirdPersonMovement.PlayerState.Attack)
+            {
+                _P.lightingEnemyTargets.Add(gameObject);
+
+            }
+            
         }
 
         if(enemyState != EnemyState.Die)

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class BossFightManager : Singleton<BossFightManager>
 {
+
+
     // Start is called before the first frame update
     void Start()
     {

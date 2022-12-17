@@ -10,7 +10,8 @@ public class GameBehaviour : MonoBehaviour
 
     protected static ThirdPersonMovement _P { get { return ThirdPersonMovement.INSTANCE; } }
     protected static CameraSwap _CS { get { return CameraSwap.INSTANCE; } }
-    protected static BossFightManager _BF { get { return BossFightManager.INSTANCE; } }
+    protected static BossFightManager _BFM { get { return BossFightManager.INSTANCE; } }
+    protected static Boss _B { get { return Boss.INSTANCE; } }
     protected static GuidanceStoneManager _GSM { get { return GuidanceStoneManager.INSTANCE; } }
 
     public float RandomFloatBetwenTwoFloats(float _float1, float _float2)
@@ -20,7 +21,7 @@ public class GameBehaviour : MonoBehaviour
         return result;
     }
 
-    public int RandomFloatBetwenTwoInts(int _int1, int _int2)
+    public int RandomIntBetwenTwoInts(int _int1, int _int2)
     {
         int result = (int) Random.Range(_int1, _int2);
 
