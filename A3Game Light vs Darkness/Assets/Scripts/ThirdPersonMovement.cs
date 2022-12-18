@@ -6,6 +6,10 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UIElements;
+using Cursor = UnityEngine.Cursor;
+using UnityEditor.SearchService;
+using UnityEngine.SceneManagement;
+using Scene = UnityEngine.SceneManagement.Scene;
 
 public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
 {
@@ -18,7 +22,7 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
 
     public enum PlayerMovement
     {
-        ThirdPerson, FPS
+        ThirdPerson, FPS, None
 
     }
 
@@ -44,7 +48,7 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
     public float turnSmoothTime = 0.1f;
     float turnSmoothVelocity;
 
-    //jumping
+    [Header("Jumping")]
     public float gravity = -9.81f;
     public float jumpHeight = 1f;
     public Transform groundCheck;
@@ -59,6 +63,7 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
     public float playerHealth = 100; //temp
     public int playerDamage = 10;
     public float speed = 6f;
+    public int killCount = 0;
 
     [Header("Animation")]
     Animator anim;
@@ -79,11 +84,13 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
     public LineRenderer lightingBounce;
     public List<GameObject> lightingEnemyTargets;
 
+    public Transform bossRoomTP;
 
     private void Start()
     {
-        UnityEngine.Cursor.lockState = CursorLockMode.None;
+        Cursor.lockState = CursorLockMode.Locked;
         anim = GetComponent<Animator>();
+        _UI.UpdateKillCount();
  
     }
 
@@ -91,6 +98,11 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
     // Update is called once per frame
     void Update()
     {
+        string currentScene = SceneManager.GetActiveScene().ToString();
+        if (currentScene == "Title") anim.SetBool("IdleTitle", true);
+        else anim.SetBool("IdleTitle", false);
+
+
 
         switch (hookshotState)
         {
@@ -122,78 +134,86 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
                 //if not grounded, starting falling
                 else
                 {
-                    if (isJumping && velocity.y < 0 || velocity.y < -2)
+                    playerState = PlayerState.Fall;
+
+                }
+
+                if(playerState != PlayerState.Die)
+                {
+                    //jump animations and movement
+                    if (Input.GetButtonDown("Jump") && isGrounded)
                     {
-                        playerState = PlayerState.Fall;
+                        playerState = PlayerState.Jump;
+
                     }
+
+                    //attack
+                    if (Input.GetButton("Fire1"))
+                    {
+                        playerState = PlayerState.Attack;
+                    }
+                    //reset attackTime when mouse button is release
+                    if (Input.GetButtonUp("Fire1"))
+                    {
+                        speed = 6;
+                        attackTime = 0;
+                        anim.SetFloat("AttackTime", attackTime);
+
+                        playerState = PlayerState.Idle;
+                    }
+
+                    if (Input.GetKeyDown(KeyCode.Tab))
+                    {
+                        fpsMode = !fpsMode;
+                        print(fpsMode);
+                    }
+
+                    if (fpsMode)
+                    {
+                        playerMovement = PlayerMovement.FPS;
+                        _CS.fPCameraOn();
+                    }
+                    else if (!fpsMode)
+                    {
+                        _CS.followPlayerCameraOn();
+                        playerMovement = PlayerMovement.ThirdPerson;
+                    }
+
+                    HookshotStart();
                 }
 
 
 
-
-
-                //jump animations and movement
-                if (Input.GetButtonDown("Jump") && isGrounded)
-                {
-                    playerState = PlayerState.Jump;
-
-                }
-
-                //attack
-                if (Input.GetButton("Fire1"))
-                {
-                    playerState = PlayerState.Attack;
-                }
-                //reset attackTime when mouse button is release
-                if (Input.GetButtonUp("Fire1"))
-                {
-                    speed = 6;
-                    attackTime = 0;
-                    anim.SetFloat("AttackTime", attackTime);
-
-                    playerState = PlayerState.Idle;
-                }
-
-                if (Input.GetKeyDown(KeyCode.Tab))
-                {
-                    fpsMode = !fpsMode;
-                    print(fpsMode);
-                }
-
-                if (fpsMode)
-                {
-                    playerMovement = PlayerMovement.FPS;
-                    _CS.fPCameraOn();
-                }
-                else if (!fpsMode)
-                {
-                    _CS.followPlayerCameraOn();
-                    playerMovement = PlayerMovement.ThirdPerson;
-                }
-
-                HookshotStart();
+                
 
 
                 switch (playerMovement)
                 {
                     case PlayerMovement.ThirdPerson:
-                        //WASD inputs
-                        float horizontal = Input.GetAxisRaw("Horizontal");
-                        float vertical = Input.GetAxisRaw("Vertical");
-                        direction = new Vector3(horizontal, 0f, vertical).normalized;
 
-                        if (Input.GetButtonDown("Jump") && isGrounded)
+                        if(playerState != PlayerState.Die)
                         {
-                            playerState = PlayerState.Jump;
-                        }
+                            //WASD inputs
+                            float horizontal = Input.GetAxisRaw("Horizontal");
+                            float vertical = Input.GetAxisRaw("Vertical");
+                            direction = new Vector3(horizontal, 0f, vertical).normalized;
 
-                        if (direction.magnitude >= 0.1f)
-                        {
-                            playerState = PlayerState.Run;
+                            if (Input.GetButtonDown("Jump") && isGrounded)
+                            {
+                                playerState = PlayerState.Jump;
+                            }
+
+                            if (direction.magnitude >= 0.1f)
+                            {
+                                playerState = PlayerState.Run;
+                            }
                         }
+                        
                         break;
                     case PlayerMovement.FPS:
-                        //cannot move
+                        velocity = Vector3.zero;
+                        velocityMomentum = Vector3.zero;
+                        this.velocity = transform.position * 0;
                         break;
                 }
 
@@ -212,7 +232,7 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
 
                         break;
                     case PlayerState.Run:
-                        this.velocity = transform.position * 0;
+                        this.velocity = transform.position * 0; 
                         anim.SetFloat("Speed", speed);
 
                         if (direction.magnitude >= 0.1f)
@@ -248,16 +268,22 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
                         //check if not running if so slowly decrease speed
                         else StartCoroutine(ResetSpeed());
 
+                        if(!isGrounded) playerState = PlayerState.Fall;
+
+
                         break;
                     case PlayerState.Attack:
 
                         Attack();
 
 
-
-
                         break;
+
                     case PlayerState.Die:
+                        print("DIE");
+                        playerMovement = PlayerMovement.FPS; //stop movement
+                        StartCoroutine(Die());
+
                         break;
                     case PlayerState.Jump:
 
@@ -278,7 +304,7 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
                         anim.SetBool("IsFalling", true);
                         isJumping = false;
 
-                        if (isGrounded)
+                        if (isGrounded && playerState != PlayerState.Die)
                         {
                             playerState = PlayerState.Idle;
                         }
@@ -329,6 +355,17 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
 
         }
 
+    }
+
+    IEnumerator Die()
+    {
+        print("ANIM DIE");
+        AnimationTrigger("Die");
+        
+
+        yield return new WaitForSeconds(3f);
+        Cursor.lockState = CursorLockMode.None;
+        _UI.GameOver();
     }
 
     void HookshotStart()
@@ -481,6 +518,7 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
         if(attackTime > 20)
         {
             this.velocity = transform.forward * 2;
+            velocity.y += gravity * Time.deltaTime;
         }
 
         
@@ -505,7 +543,13 @@ public class ThirdPersonMovement : Singleton<ThirdPersonMovement>
     {
         print("PlayerHit");
         playerHealth -= damage;
-        AnimationTrigger("Hit");
+        if(playerHealth <= 0)
+        {
+            print("Health less than 0");
+            
+            playerState = PlayerState.Die;
+        }
+        else AnimationTrigger("Hit");
     }
 
 

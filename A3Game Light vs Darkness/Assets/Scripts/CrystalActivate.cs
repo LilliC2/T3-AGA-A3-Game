@@ -7,8 +7,9 @@ public class CrystalActivate : GameBehaviour
     public GameObject[] crystalsRequiredToActivate;
     public List<bool> crystalsLit;
     public GameObject openGameobject;
-    bool allLit;
-
+    public bool allLit;
+    public bool bossActive;
+    bool openedRoof;
 
     // Start is called before the first frame update
     void Start()
@@ -22,20 +23,25 @@ public class CrystalActivate : GameBehaviour
     // Update is called once per frame
     void Update()
     {
-        for(int j = 0; j != crystalsRequiredToActivate.Length; j++)
+        for (int j = 0; j != crystalsRequiredToActivate.Length; j++)
         {
             crystalsLit[j] = crystalsRequiredToActivate[j].GetComponent<Crystals>().LitCheck();
             if (crystalsLit[j] == true)
             {
                 CheckIfListIsTrue();
-                print("this one is true");
             }
 
             if (!allLit && j == crystalsRequiredToActivate.Length) j = 0;
 
         }
 
-        if(allLit) openGameobject.SetActive(false);
+        if(allLit && !bossActive) openGameobject.SetActive(false);
+        if(!openedRoof && allLit && bossActive)
+        {
+            if (allLit && bossActive) _BFM.OpenRoof();
+            openedRoof = true;
+        }
+        
 
     }
 
@@ -48,6 +54,7 @@ public class CrystalActivate : GameBehaviour
             if (crystalsLit[i] == false)
             {
                 checkTrue = false;
+                openedRoof = false;
             }
         }
 

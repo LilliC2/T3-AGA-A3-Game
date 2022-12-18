@@ -19,7 +19,6 @@ public class GuidanceStoneTrigger : GameBehaviour
         {
             PlayerInteract();
         }
-        _UI.InteractPrompt(playerInRange);
 
     }
 
@@ -28,6 +27,7 @@ public class GuidanceStoneTrigger : GameBehaviour
         if (other.gameObject.CompareTag("Player"))
         {
             playerInRange = true;
+            _UI.InteractPromptOn();
             print("Press I to interact");
         }
     }
@@ -37,7 +37,8 @@ public class GuidanceStoneTrigger : GameBehaviour
         if (other.gameObject.CompareTag("Player"))
         {
             playerInRange = false;
-            
+            _UI.InteractPromptOff();
+
         }
     }
 

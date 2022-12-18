@@ -6,31 +6,37 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UIElements;
 using static Enemy;
+using static ThirdPersonMovement;
 
 public class Enemy : GameBehaviour
 {
+    
     public enum EnemyState
     {
         Patrol, Chase, Attack, Hit, Die 
     }
 
+    [Header("States")]
     EnemyState enemyState;
     
     public NavMeshAgent agent;
     public Transform player;
-    public LayerMask whatIsGround, whatIsPlayer;
+    
 
+    [Header("Enemy Stats")]
     public float health = 20;
     float attack = 3;
 
-    //patrolling
+    [Header("Patroling")]
+    public LayerMask whatIsGround, whatIsPlayer;
     public Vector3 walkPoint;
     bool walkPointSet;
     public float walkPointRange;
+    bool seePlayer;
 
 
-    //attacking
-    public float timeBetweenAttacks = 20;
+    [Header("Attacking")]
+    public float timeBetweenAttacks = 50;
     public float sightRange, attackRange,playerHitRange;
     public bool playerInSightRange, playerInAttackRange, enemyInHitRange;
     public bool alreadyAttacked = false;
@@ -39,17 +45,8 @@ public class Enemy : GameBehaviour
     bool hit;
     bool hitPlayer;
 
-    //states
-    bool walking;
-    bool idle;
+    [Header("Orbit")]
     bool rotateDetermined = false;
-
-    //animation
-    //animation
-    Animator enemyAnimation;
-    bool deathAnimation = false;
-
-    //atacking orbit
     public bool orbiting = true;
     float time;
     int rotate;
@@ -57,6 +54,13 @@ public class Enemy : GameBehaviour
     bool preJumpPosBool = false;
     Vector3 preJumpPos;
     bool enterting;
+
+    [Header("Animation")]
+    Animator enemyAnimation;
+    bool deathAnimation = false;
+
+    //atacking orbit
+    
 
 
     private void Awake()
@@ -79,11 +83,23 @@ public class Enemy : GameBehaviour
         playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
         enemyInHitRange = Physics.CheckSphere(transform.position, playerHitRange, whatIsPlayer);
 
+        if (Physics.Raycast(this.transform.position, this.transform.forward, out RaycastHit raycastHit))
+        {
+
+            if (raycastHit.collider.CompareTag("Player"))
+            {
+                seePlayer = true;
+            }
+            else seePlayer = false;
+
+        }
+
+
         //makes sure once enemy dies it cannot react to anything above
-        if(enemyState != EnemyState.Die && enemyState != EnemyState.Hit)
+        if (enemyState != EnemyState.Die && enemyState != EnemyState.Hit)
         {
             if (!playerInSightRange && !playerInAttackRange) enemyState = EnemyState.Patrol;
-            if (playerInSightRange && !playerInAttackRange) enemyState = EnemyState.Chase;
+            if (playerInSightRange && !playerInAttackRange && seePlayer) enemyState = EnemyState.Chase;
             if (playerInAttackRange && playerInSightRange) enemyState = EnemyState.Attack;
         }
 
@@ -203,7 +219,7 @@ public class Enemy : GameBehaviour
 
         if (orbiting)
         {
-
+            hitPlayer = false;
             OrbitPlayer();
             
             int waitTime = 5;
@@ -259,10 +275,12 @@ public class Enemy : GameBehaviour
                     StartCoroutine(PlayAnimationBool("Stab Attack"));
 
                     // ADD ATTACK CODE IN HERE
-                    if (hitPlayer)
+                    if (!hitPlayer)
                     {
-                        print("ENTERED HIT PLAYER");
                         _P.PlayerTakeDamage(attack);
+                        hitPlayer = true;
+                        print("Hit player with " + attack);
+                        
                     }
                     hit = true;
 
@@ -273,6 +291,7 @@ public class Enemy : GameBehaviour
 
                 if(hit)
                 {
+                    
                     enterting = false;
                     yield return new WaitForSeconds(1);
                     enemyAnimation.SetBool("Run Backward", true);
@@ -299,6 +318,7 @@ public class Enemy : GameBehaviour
         {
             
             orbiting = true;
+            hitPlayer = true;
         }
 
         
@@ -366,7 +386,8 @@ public class Enemy : GameBehaviour
     }
 
     private void DestroyEnemy()
-    {        
+    {
+        _P.lightingEnemyTargets.Remove(gameObject);
         Destroy(gameObject);
     }
 
@@ -378,6 +399,9 @@ public class Enemy : GameBehaviour
         AnimationTrigger("Die");
         _P.lightingEnemyTargets.Remove(gameObject);
         yield return new WaitForSeconds(6.5f);
+
+        _P.killCount++;
+        _UI.UpdateKillCount();
 
         DestroyEnemy();
     }
@@ -396,11 +420,11 @@ public class Enemy : GameBehaviour
 
         if (other.gameObject.CompareTag("LightningRange"))
         {
-            if (_P.playerState == ThirdPersonMovement.PlayerState.Attack)
-            {
-                _P.lightingEnemyTargets.Add(gameObject);
+            print("in lightnight range");
+            
+            _P.lightingEnemyTargets.Add(gameObject);
 
-            }
+            
             
         }
 
@@ -415,6 +439,8 @@ public class Enemy : GameBehaviour
         
 
     }
+
+
 
 
     private void OnTriggerExit(Collider other)

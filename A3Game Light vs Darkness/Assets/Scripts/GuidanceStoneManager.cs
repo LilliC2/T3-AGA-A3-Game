@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GuidanceStoneManager : Singleton<GuidanceStoneManager>
 {
-    public List<GameObject> guidanceStonesList;
+    public GameObject[] guidanceStonesList;
     public string[] guidanceStoneText;
     int index;
     public Animator guidanceStoneAnim;
@@ -14,14 +14,13 @@ public class GuidanceStoneManager : Singleton<GuidanceStoneManager>
     void Start()
     {
         guidanceStoneAnim.GetComponent<Animator>();
-
-        guidanceStonesList.Add(GameObject.FindWithTag("GuidanceStone"));
         
-        guidanceStoneText = new string[10];
+        guidanceStoneText = new string[4];
 
-        guidanceStoneText[0] = "Hit the Crystals with your sword to transfer light to them";
-        guidanceStoneText[1] = "Light can be transfered through enemies as well";
+        guidanceStoneText[0] = "Hit the Crystals with your sword to transfer light to them and heal you.";
+        guidanceStoneText[1] = "Light can be transfered through enemies as well.";
         guidanceStoneText[2] = "Press 'Tab' to aim your light at the light circle and press 'E' to fire to throw yourself towards it.";
+        guidanceStoneText[3] = "To defeat the boss, light up the crystals on the walls to weaken it, then strike.";
     }
 
     public string FindText(string _name)
@@ -31,7 +30,7 @@ public class GuidanceStoneManager : Singleton<GuidanceStoneManager>
 
         if(!nameFound)
         {
-            for (int i = 0; i < guidanceStonesList.Count; i++)
+            for (int i = 0; i < guidanceStonesList.Length; i++)
             {
                 if (guidanceStonesList[i].name == _name)
                 {

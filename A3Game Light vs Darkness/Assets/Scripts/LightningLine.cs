@@ -26,7 +26,7 @@ public class LightningLine : GameBehaviour
 
     void AOELightAttack()
     {
-        print("Call lightning");
+        print("aoe light");
         int inRangeCount = _P.lightingEnemyTargets.Count + 1;
 
         _P.lightingBounce.positionCount = inRangeCount;
@@ -37,7 +37,7 @@ public class LightningLine : GameBehaviour
 
         int j = 1;
 
-        for (int i = 0; i < inRangeCount; i++)
+        for (int i = 0; i < 3; i++)
         {
 
 
@@ -62,6 +62,7 @@ public class LightningLine : GameBehaviour
     {
         if (other.gameObject.CompareTag("Enemy"))
         {
+            print("line go");
             _P.lightingBounce.enabled = true;
         }
 

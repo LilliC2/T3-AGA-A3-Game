@@ -6,6 +6,7 @@ public class Crystals : GameBehaviour
 {
     Animator anim;
     public bool lit;
+    public bool bossCrystal = false;
 
     // Start is called before the first frame update
     void Start()
@@ -14,27 +15,46 @@ public class Crystals : GameBehaviour
         anim = GetComponent<Animator>();
     }
 
+    private void Update()
+    {
+
+        if (!lit) StartCoroutine(GlowTurnOff());
+        if (bossCrystal && _B.bossState == Boss.BossState.SummonRoof) ResetCrystal();
+    }
 
     private void OnCollisionEnter(Collision collision)
     {
-        print(collision);
-
         if(collision.gameObject.CompareTag("Sword"))
         {
             //only take damage if player is attacking
             if (_P.playerState == ThirdPersonMovement.PlayerState.Attack)
             {
-                StartCoroutine( GlowStartUp());
+                lit = true;
+                if (lit) StartCoroutine(GlowStartUp());
             }
         }    
+
+        
+    }
+
+    void ResetCrystal()
+    {
+       lit = false;
     }
 
     IEnumerator GlowStartUp()
     {
-        lit=true;
+        _P.playerHealth += 30;
         AnimationTrigger("LightUp");
         yield return new WaitForSeconds(1);
         anim.SetBool("Glow", true);
+    }
+
+    IEnumerator GlowTurnOff()
+    {
+        AnimationTrigger("TurnOff");
+        yield return new WaitForSeconds(1);
+        anim.SetBool("Glow", false);
     }
 
     public bool LitCheck()

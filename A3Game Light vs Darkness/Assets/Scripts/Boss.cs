@@ -5,133 +5,200 @@ using static Enemy;
 
 public class Boss : Singleton<Boss>
 {
-    float bossHealth = 100;
-    float bossMaxHealth = 100;
-    float bossDamage = 10;
-    float waitBetweenAttacks = 5;
-    float vunerableTime = 5;
+    [Header("Boss Stats")]
+    public float bossHealth = 500;
+    public float bossMaxHealth = 500;
+    float bossDamage = 20;
+    float waitBetweenAttacks = 10;
+    float vunerableTime = 10;
 
-    float attackRange;
-    bool playerInBossRange;
+    [Header("Attacks")]
+    public float attackRange = 20;
     bool alreadyAttacked;
     public LayerMask whatIsPlayer;
+    public bool vunerable;
+    bool randomAttackTrue;
+
+    bool killAdded = false;
+
+    public GameObject bossSpinCollider;
+    public GameObject bossStabCollider;
+    public GameObject hitCollider;
+
+    bool roofSummoned;
+
+    [Header("Player")]
+    public GameObject player;
 
     Animator bossAnim;
+    bool deathAnim;
 
     public enum BossState
     {
         Vunerable, Idle, SpinAttack, StabAttack, SummonRoof, Die
     }
 
-    BossState bossState;
+    public BossState bossState;
 
     // Start is called before the first frame update
     void Start()
     {
         bossAnim = GetComponent<Animator>();
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
+        //update UI with boss health
+        _UI.UpdateBossHealthBar(bossHealth);
+
         //check if player is in range
-        playerInBossRange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
 
         //when player in range, begin boss fight 
-        if (playerInBossRange) bossState = BossState.Idle;
+        //if (playerInBossRange) bossState = BossState.Idle;
 
-        switch(bossState)
+        switch (bossState)
         {
             case BossState.Idle:
+                roofSummoned = false;
+                alreadyAttacked = false;
                 StartCoroutine(IdleBoss());
                 break;
             case BossState.SpinAttack:
-                SpinAttack();
+                if(!alreadyAttacked) StartCoroutine(SpinAttack());
                 break;
             case BossState.StabAttack:
-                StabAttack();
+                
+                if(!alreadyAttacked) StartCoroutine(StabAttack());
+
                 break;
             case BossState.Vunerable:
+                if (vunerable) StartCoroutine(Vunerble());
+
                 break;
             case BossState.SummonRoof:
-                SummonRoof();
+                if(!roofSummoned) StartCoroutine(SummonRoof());
                 break;
             case BossState.Die:
+                if(!deathAnim) StartCoroutine(Die());
+
                 break;
         }
 
-        //check boss health
-        //time between attacks decrases lower the health
-        AdjustDifficultyBasedOnHealth();
+
+            //check boss health
+            //time between attacks decrases lower the health
+            //AdjustDifficultyBasedOnHealth();
     }
 
 
     IEnumerator IdleBoss()
     {
+        
+        randomAttackTrue = false;
+
+        bossSpinCollider.SetActive(false);
+        bossStabCollider.SetActive(false);
         //idle animation bool true
-
         //wait time between attacks
-        yield return new WaitForSeconds(waitBetweenAttacks);
 
-        //randomise which attack goes
-        int r = RandomIntBetwenTwoInts(0, 1);
+        yield return new WaitForSecondsRealtime(waitBetweenAttacks);
+        
+        
+            //randomise which attack goes
+            if (!randomAttackTrue)
+            {
+                randomAttackTrue = true;
+                int r = RandomIntBetwenTwoInts(0, 2);
 
-        switch(r)
-        {
-            //spin attack
-            case 0:
-                bossState = BossState.SpinAttack;
-                break;
 
-            //stab attack
-            case 1:
-                bossState = BossState.StabAttack;
-                break;
-        }
+                switch (r)
+                {
+                    //spin attack
+                    case 0:
+                        randomAttackTrue = true;
+                        bossState = BossState.SpinAttack;
 
+                        break;
+
+                    //stab attack
+                    case 1:
+
+                        randomAttackTrue = true;
+                        bossState = BossState.StabAttack;
+                        break;
+                }
+            
+
+
+
+        
+             }
     }
 
-    void SpinAttack()
+    IEnumerator SpinAttack()
     {
-        //spin animation
+        alreadyAttacked = true;
+        
+        bossSpinCollider.SetActive(true);
+        AnimationTrigger("SpinAttack");
+        bossSpinCollider.SetActive(false);
+        yield return new WaitForSeconds(waitBetweenAttacks);
+
+        
+        bossState = BossState.Idle;
 
         //after return to idle
     }
 
-    void StabAttack()
+    IEnumerator StabAttack()
     {
-        //stab animation
+        this.transform.LookAt(player.transform.position);
+        alreadyAttacked = true;
+        bossStabCollider.SetActive(true);
+        AnimationTrigger("StabAttack");
+        bossStabCollider.SetActive(false);
+        yield return new WaitForSeconds(waitBetweenAttacks);
+
+        
+        bossState = BossState.Idle;
         //after return to idle
     }
 
     IEnumerator Vunerble()
     {
-        //lying down animation bool
-
+        
+        vunerable = false;
+        AnimationTrigger("Vunerable");
+        yield return new WaitForSeconds(0.5f);
+        bossAnim.SetBool("OnGround", true);
         yield return new WaitForSeconds(vunerableTime);
 
-        
+
         if (bossHealth <= 0)
         {
             bossState = BossState.Die;
         }
         else
         {
-            //getting up animation
+            bossAnim.SetBool("OnGround", false);
             bossState = BossState.SummonRoof;
         }
 
     }
 
-    void SummonRoof()
+    IEnumerator SummonRoof()
     {
-        //roar animation
+        hitCollider.SetActive(false);
+        print("Summon Roof");
+        roofSummoned = true;
+        AnimationTrigger("SummonRoof");
         //stun player 
 
-        //this will be handles in boss fight manager
+        yield return new WaitForSeconds(1f);
         //roof resummon
-        //turn off lights
+        _BFM.CloseRoof();
 
         bossState = BossState.Idle;
 
@@ -139,25 +206,37 @@ public class Boss : Singleton<Boss>
 
     IEnumerator Die()
     {
+        deathAnim = true;
         //trigger death animation
+        bossAnim.SetBool("Die", true);
         //tell boss fight manger player has won
+        _BFM.BossDeath();
+        if(!killAdded)
+        {
+            _P.killCount++;
+            killAdded = true;
+        }
+        
+        _UI.UpdateKillCount();
         yield return new WaitForSeconds(6.5f);
-        Destroy(gameObject);
+
     }
 
     void AdjustDifficultyBasedOnHealth()
     {
         float bossHealthPercent = (bossHealth / bossMaxHealth) * 100;
 
-        if(bossHealthPercent <= 50 && bossHealthPercent > 25)
+        if (bossHealthPercent <= 50 && bossHealthPercent > 25)
         {
+            print("Less than 50");
             waitBetweenAttacks = 4;
-            vunerableTime = 4;
+            vunerableTime = 7;
         }
-        if(bossHealthPercent <= 25)
+        if (bossHealthPercent <= 25)
         {
+            print("Less than 25");
             waitBetweenAttacks = 3;
-            vunerableTime = 3;
+            vunerableTime = 5;
         }
     }
 
@@ -168,10 +247,23 @@ public class Boss : Singleton<Boss>
             //only if player is attacking and boss is vunerable
             if (_P.playerState == ThirdPersonMovement.PlayerState.Attack && bossState == BossState.Vunerable)
             {
+                print("Boss Hit");
                 bossHealth -= _P.playerDamage;
+                _UI.UpdateBossHealthBar(bossHealth);
 
             }
         }
+
+        if (other.gameObject.CompareTag("Player"))
+        {
+            if(bossState != BossState.Vunerable)
+            {
+                
+                _P.PlayerTakeDamage(bossDamage);
+            }
+            
+        }
     }
+
 
 }
